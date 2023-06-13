@@ -1,20 +1,23 @@
-name: Parse and validate modules
+name: Enforce semver on the scaffold version
 
 on:
   pull_request:
     branches:
       - master
     paths:
-      - "modules/**"
+      - "scaffold/**"
+      - "dist/cookie/**"
 
 jobs:
-  parse:
+  semver:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "yarn"
       - run: yarn install --immutable
-      - run: yarn run parse
+      - run: yarn run semver
