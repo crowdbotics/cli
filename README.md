@@ -1,5 +1,4 @@
-oclif-hello-world
-=================
+# crowdbotics-cli
 
 oclif example Hello World CLI
 
@@ -8,11 +7,15 @@ oclif example Hello World CLI
 [![GitHub license](https://img.shields.io/github/license/oclif/hello-world)](https://github.com/oclif/hello-world/blob/main/LICENSE)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g crowdbotics-cli
 $ crowdbotics-cli COMMAND
@@ -24,64 +27,33 @@ USAGE
   $ crowdbotics-cli COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`crowdbotics-cli hello PERSON`](#crowdbotics-cli-hello-person)
-* [`crowdbotics-cli hello world`](#crowdbotics-cli-hello-world)
-* [`crowdbotics-cli help [COMMANDS]`](#crowdbotics-cli-help-commands)
-* [`crowdbotics-cli plugins`](#crowdbotics-cli-plugins)
-* [`crowdbotics-cli plugins:install PLUGIN...`](#crowdbotics-cli-pluginsinstall-plugin)
-* [`crowdbotics-cli plugins:inspect PLUGIN...`](#crowdbotics-cli-pluginsinspect-plugin)
-* [`crowdbotics-cli plugins:install PLUGIN...`](#crowdbotics-cli-pluginsinstall-plugin-1)
-* [`crowdbotics-cli plugins:link PLUGIN`](#crowdbotics-cli-pluginslink-plugin)
-* [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin)
-* [`crowdbotics-cli plugins reset`](#crowdbotics-cli-plugins-reset)
-* [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin-1)
-* [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin-2)
-* [`crowdbotics-cli plugins update`](#crowdbotics-cli-plugins-update)
 
-## `crowdbotics-cli hello PERSON`
+- [`crowdbotics-cli info`](#crowdbotics-cli-info)
+- [`crowdbotics-cli help [COMMANDS]`](#crowdbotics-cli-help-commands)
 
-Say hello
+## `crowdbotics-cli info`
+
+Displays info about the crowdbotics cli.
 
 ```
 USAGE
-  $ crowdbotics-cli hello PERSON -f <value>
-
-ARGUMENTS
-  PERSON  Person to say hello to
-
-FLAGS
-  -f, --from=<value>  (required) Who is saying hello
+  $ crowdbotics-cli info
 
 DESCRIPTION
-  Say hello
+  Display current info about the crowdbotics CLI
 
 EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
+  $ crowdbotics-cli info
+  hello
 ```
 
 _See code: [src/commands/hello/index.ts](https://github.com/danielsousaio/crowdbotics-cli/blob/v0.0.0/src/commands/hello/index.ts)_
-
-## `crowdbotics-cli hello world`
-
-Say hello world
-
-```
-USAGE
-  $ crowdbotics-cli hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ crowdbotics-cli hello world
-  hello world! (./src/commands/hello/world.ts)
-```
-
-_See code: [src/commands/hello/world.ts](https://github.com/danielsousaio/crowdbotics-cli/blob/v0.0.0/src/commands/hello/world.ts)_
 
 ## `crowdbotics-cli help [COMMANDS]`
 
@@ -161,7 +133,7 @@ ALIASES
   $ crowdbotics-cli plugins add
 
 EXAMPLES
-  $ crowdbotics-cli plugins add myplugin 
+  $ crowdbotics-cli plugins add myplugin
 
   $ crowdbotics-cli plugins add https://github.com/someuser/someplugin
 
@@ -230,7 +202,7 @@ ALIASES
   $ crowdbotics-cli plugins add
 
 EXAMPLES
-  $ crowdbotics-cli plugins install myplugin 
+  $ crowdbotics-cli plugins install myplugin
 
   $ crowdbotics-cli plugins install https://github.com/someuser/someplugin
 
@@ -377,4 +349,5 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.1.8/src/commands/plugins/update.ts)_
+
 <!-- commandsstop -->
