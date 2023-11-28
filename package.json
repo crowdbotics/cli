@@ -53,7 +53,7 @@
       }
     }
   },
-  "repository": "danielsousaio/crowdbotics-cli",
+  "repository": "crowdbotics/crowdbotics-cli",
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint . --ext .ts",
@@ -65,7 +65,7 @@
     "version": "oclif readme && git add README.md"
   },
   "version": "0.0.0",
-  "bugs": "https://github.com/danielsousaio/crowdbotics-cli/issues",
+  "bugs": "https://github.com/crowdbotics/crowdbotics-cli/issues",
   "keywords": [
     "oclif"
   ],
