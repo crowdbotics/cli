@@ -8,9 +8,28 @@ oclif example Hello World CLI
 
 <!-- toc -->
 
+- [crowdbotics-cli](#crowdbotics-cli)
 - [Usage](#usage)
 - [Commands](#commands)
 <!-- tocstop -->
+
+# Contributing to the CLI
+
+## Getting Started
+
+1. Clone repository
+1. Install dependencies `yarn install`
+
+## Building Release Version
+
+The Crowdbotics CLI can be built into a standalone version for Linux, MacOS, and Windows platforms.
+
+- To build a windows executable, run `npx oclif pack win`
+  - Requires 7zip and nsis installed on host machine
+- To build a debian dist, run `npx oclif pack deb`
+- To build a MacOS distributable, run `npx oclif pack macos`
+  - Requires the script to be run on a mac machine
+- TO build tarball linux distributions, run `npx oclif pack tarballs`
 
 # Usage
 
@@ -34,26 +53,18 @@ USAGE
 
 <!-- commands -->
 
-- [`crowdbotics-cli info`](#crowdbotics-cli-info)
 - [`crowdbotics-cli help [COMMANDS]`](#crowdbotics-cli-help-commands)
-
-## `crowdbotics-cli info`
-
-Displays info about the crowdbotics cli.
-
-```
-USAGE
-  $ crowdbotics-cli info
-
-DESCRIPTION
-  Display current info about the crowdbotics CLI
-
-EXAMPLES
-  $ crowdbotics-cli info
-  hello
-```
-
-_See code: [src/commands/hello/index.ts](https://github.com/danielsousaio/crowdbotics-cli/blob/v0.0.0/src/commands/hello/index.ts)_
+- [`crowdbotics-cli info`](#crowdbotics-cli-info)
+- [`crowdbotics-cli plugins`](#crowdbotics-cli-plugins)
+- [`crowdbotics-cli plugins:install PLUGIN...`](#crowdbotics-cli-pluginsinstall-plugin)
+- [`crowdbotics-cli plugins:inspect PLUGIN...`](#crowdbotics-cli-pluginsinspect-plugin)
+- [`crowdbotics-cli plugins:install PLUGIN...`](#crowdbotics-cli-pluginsinstall-plugin-1)
+- [`crowdbotics-cli plugins:link PLUGIN`](#crowdbotics-cli-pluginslink-plugin)
+- [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin)
+- [`crowdbotics-cli plugins reset`](#crowdbotics-cli-plugins-reset)
+- [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin-1)
+- [`crowdbotics-cli plugins:uninstall PLUGIN...`](#crowdbotics-cli-pluginsuninstall-plugin-2)
+- [`crowdbotics-cli plugins update`](#crowdbotics-cli-plugins-update)
 
 ## `crowdbotics-cli help [COMMANDS]`
 
@@ -74,6 +85,24 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.2.20/src/commands/help.ts)_
+
+## `crowdbotics-cli info`
+
+Hello from the Crowdbotics CLI
+
+```
+USAGE
+  $ crowdbotics-cli info
+
+DESCRIPTION
+  Hello from the Crowdbotics CLI
+
+EXAMPLES
+  $ crowdbotics-cli info
+  hello from Crowdbotics!
+```
+
+_See code: [src/commands/info/index.ts](https://github.com/crowdbotics/crowdbotics-cli/blob/v0.0.0/src/commands/info/index.ts)_
 
 ## `crowdbotics-cli plugins`
 
