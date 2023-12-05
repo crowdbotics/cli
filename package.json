@@ -37,6 +37,7 @@
   "homepage": "https://github.com/danielsousaio/crowdbotics-cli",
   "license": "Private",
   "main": "",
+  "private": true,
   "name": "crowdbotics-cli",
   "oclif": {
     "bin": "crowdbotics-cli",
