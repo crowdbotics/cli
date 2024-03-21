@@ -1,6 +1,6 @@
 {
-  "name": "modules",
-  "version": "2.3.0",
+  "name": "crowdbotics",
+  "version": "3.0.0-canary",
   "description": "Library of modules for React Native and Django apps",
   "main": "index.js",
   "bin": {

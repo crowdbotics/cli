@@ -1,95 +1,61 @@
-<h1 align="center">
-  <a href="https://crowdbotics.com">
-    Crowdbotics Modules
-  </a>
-</h1>
+Here's a README.md template for the Crowdbotics CLI:
 
-<p align="center">
-  A library of Django & React Native modules.
-</p>
+# Crowdbotics CLI
 
-<p align="center">
-  <a href="https://github.com/crowdbotics/modules/actions/workflows/lint.yml">
-    <img src="https://github.com/crowdbotics/modules/actions/workflows/lint.yml/badge.svg" alt="Source Code linter" />
-  </a>
-  <a href="https://github.com/crowdbotics/modules/actions/workflows/release.yml">
-    <img src="https://github.com/crowdbotics/modules/actions/workflows/release.yml/badge.svg" alt="Production Release" />
-  </a>
-</p>
+The Crowdbotics CLI is a powerful command-line tool designed to streamline the management of your Crowdbotics applications. It provides a suite of commands to help developers efficiently create, manage, and deploy React Native and Django modules and applications.
 
-## Contents
+## Table of Contents
 
-- [Modules library](/modules)
-- [Changelog](/CHANGELOG.md)
-- [Documentation](https://docs.crowdbotics.com)
-- [All commands](https://docs.crowdbotics.com/modules-commands)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Available Commands](#available-commands)
+- [Support](#support)
+- [License](#license)
+- [About Crowdbotics](#about-crowdbotics)
 
-## Requirements for contributing
+## Installation
 
-The following must be available in your system:
+To install the Crowdbotics CLI, you need to have Node.js (version 18.0 or higher) installed on your system. You can then install the CLI globally using npm:
 
-- [node](https://nodejs.org/en)
-- [yarn](https://yarnpkg.com/)
-- [python](https://www.python.org/)
-- [pipenv](https://pypi.org/project/pipenv/)
-- [urllib3](https://urllib3.readthedocs.io/en/stable/) without this the project will not run in ```macOS``` environments
-
-Node `v18.16.0` (LTS) recommended.
-
-## Getting started
-
-Install node modules:
-
-```sh
-yarn install
+```bash
+npm install -g crowdbotics
 ```
 
-Install python packages:
+## Usage
 
-```sh
-pipenv install
+After installation, you can run the CLI from anywhere on your system using the `cb` command. The CLI provides a range of commands to manage your Crowdbotics application.
+
+### Available Commands
+
+- `cb parse`: Parse and validate your modules.
+- `cb demo`: Generate a local React Native and Django demo app.
+- `cb add`: Install a module in the demo app.
+- `cb remove`: Remove a module from the demo app.
+- `cb create`: Create a new module of a given type.
+- `cb commit`: Update an existing module from the demo source code.
+- `cb init`: Initialize a blank modules repository.
+- `cb upgrade`: Upgrade your existing app's scaffold to the latest version.
+- `cb help`: Show the help page with available commands.
+- `cb login`: Login to your Crowdbotics account (Requires 2FA authentication).
+- `cb logout`: Logout of your Crowdbotics account.
+- `cb publish`: Publish your modules to your organization's private catalog.
+- `cb modules`: Manage modules for your organization.
+
+For detailed information about each command and its options, run:
+
+```bash
+cb help
 ```
 
-Spin a demo app using the customized React Native template:
+## Support
 
-```sh
-yarn run demo
+For support using the Crowdbotics CLI or to report bugs, please visit the [Crowdbotics Support page](https://app.crowdbotics.com/dashboard/user/support).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## About Crowdbotics
+
+Crowdbotics provides a platform to build web and mobile applications with the ease of visual development tools and the power of traditional code. For more information, visit [crowdbotics.com](https://www.crowdbotics.com).
 ```
-
-Install modules to your demo app:
-
-```sh
-yarn run add react-native-app-menu
-```
-
-Create new modules and test/validate your work locally before submitting a PR:
-
-```sh
-yarn run parse
-```
-
-Install modules globally to your system:
-```sh
-npm install -g cb
-```
-
-### macOS config
-- make sure to have a compatible version of urllib3 with openssl. urllib3 v2.0 or higher is compatible with OpenSSL 1.1.1 or higher
-
-## Modules updates checklist
-
-When adding a new module please make sure that:
-
-- it includes a `meta.json` file in the module's root directory.
-- it includes a `preview.png` image in the module's root directory.
-- `yarn run parse` checks pass.
-- you ran `yarn run dist` and added the changes.
-- you can open your module in the demo app (`yarn run demo`, `yarn run add <your-module-name-here>`, `cd demo; npx react-native-start`).
-
-When making changes to a module please make sure that:
-
-- `yarn run parse` checks pass.
-- you ran `yarn run dist` and added the changes.
-- you can open your module in the demo app (`yarn run demo`, `yarn run add <your-module-name-here>`, `cd demo; npx react-native-start`).
-
-Include as much documentation for your module as possible, and if you haven't seen it yet we created a style guide for [Authoring Modules](https://docs.crowdbotics.com/authoring-modules).
