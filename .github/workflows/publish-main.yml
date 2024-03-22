@@ -1,0 +1,71 @@
+# This GitHub Actions workflow automates the deployment of an NPM package upon pushes to the main branch.
+
+name: Deploy (main branch)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: deploy
+    environment: production
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    env:
+      GIT_COMMITTER_NAME: github-actions[bot]
+      GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+      GIT_AUTHOR_NAME: github-actions[bot]
+      GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch Depth 0 ensures that backmerging to develop will work a few steps later.
+
+      - name: Setup Node Version ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://registry.npmjs.org"
+
+      # Bump the package version automatically.
+      # Assumes all pushes are minor version right now. When the time comes we can let it do major or patch versions too.
+      - name: "Automated Version Bump"
+        run: |
+          yarn version --minor
+
+      # Publish the new package version to npm. If this fails, no changes will be reflected in git repository.
+      - name: Publish to NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+
+      # package.json will have a commit updating the version field. Push this to the main.
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+
+      # This repo follows git flow. Now we want to back-merge the upgrade commit into develop for consistency.
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          ref: "develop"
+          fetch-depth: 0
+
+      # Do not create a new commit, fast forward only. This will intentionally fail if develop has changes that main does not.
+      # If this happens, back-merge manually. Publishing action has already happened.
+      - name: Merge main into develop
+        run: |
+          git merge --ff-only origin/main
+
+      - name: Push changes to develop
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "develop"
