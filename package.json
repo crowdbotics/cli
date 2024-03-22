@@ -1,7 +1,7 @@
 {
   "name": "crowdbotics",
   "version": "3.0.0-canary",
-  "description": "Library of modules for React Native and Django apps",
+  "description": "A powerful command-line tool designed to streamline the management of your Crowdbotics applications",
   "main": "index.js",
   "bin": {
     "cb": "./index.js"
@@ -14,20 +14,19 @@
     "demo": "npx . demo",
     "add": "npx . add",
     "remove": "npx . remove",
-    "parse": "npx . parse --source modules",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "yarn run eslint modules scripts",
+    "lint": "yarn run eslint scripts",
     "commit-module": "npx . commit"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crowdbotics/modules.git"
+    "url": "git+https://github.com/crowdbotics/cli.git"
   },
   "author": "crowdbotics",
   "bugs": {
-    "url": "https://github.com/crowdbotics/modules/issues"
+    "url": "https://github.com/crowdbotics/cli/issues"
   },
-  "homepage": "https://github.com/crowdbotics/modules#readme",
+  "homepage": "https://github.com/crowdbotics/cli#readme",
   "dependencies": {
     "@babel/cli": "^7.17.10",
     "@babel/core": "^7.18.5",

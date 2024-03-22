@@ -1,5 +1,3 @@
-Here's a README.md template for the Crowdbotics CLI:
-
 # Crowdbotics CLI
 
 The Crowdbotics CLI is a powerful command-line tool designed to streamline the management of your Crowdbotics applications. It provides a suite of commands to help developers efficiently create, manage, and deploy React Native and Django modules and applications.
@@ -20,6 +18,21 @@ To install the Crowdbotics CLI, you need to have Node.js (version 18.0 or higher
 ```bash
 npm install -g crowdbotics
 ```
+
+## Setting up your Dev Environment
+
+The following must be available in your system:
+
+- [node](https://nodejs.org/en)
+- [yarn](https://yarnpkg.com/)
+- [python](https://www.python.org/)
+- [pipenv](https://pypi.org/project/pipenv/)
+- [urllib3](https://urllib3.readthedocs.io/en/stable/) without this the project will not run in ```macOS``` environments
+
+Node `v18.18.0` (LTS) recommended.
+
+Please see the [Crowdbotics documentation](https://docs.crowdbotics.com/docs/set-up-your-dev-env) for detailed instructions on how to setup your environment.
+
 
 ## Usage
 
