@@ -1,6 +1,6 @@
 {
   "name": "crowdbotics",
-  "version": "3.0.0-canary",
+  "version": "3.0.0-canary.02",
   "description": "A powerful command-line tool designed to streamline the management of your Crowdbotics applications",
   "main": "index.js",
   "bin": {
