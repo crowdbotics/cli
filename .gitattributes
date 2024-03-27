@@ -1,0 +1,5 @@
+# Normalize all checked in files line endings to LF, and not CRLF.
+# Local line endings in the working tree are untouched meaning that Windows
+# can keep using its different line endings locally but doesn't submit CRLF
+# line endings.
+* text=auto
