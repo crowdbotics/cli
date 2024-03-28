@@ -3,6 +3,7 @@
   "version": "3.0.1",
   "description": "A powerful command-line tool designed to streamline the management of your Crowdbotics applications",
   "main": "index.js",
+  "license": "MIT",
   "bin": {
     "cb": "./index.js"
   },
