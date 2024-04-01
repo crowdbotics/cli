@@ -10,6 +10,7 @@ import {
   generateMeta
 } from "./utils/templates.js";
 import { execOptions, configurePython } from "./utils/environment.js";
+import inquirer from "inquirer";
 
 function generateRNFiles(base, name, relative = "/") {
   if (relative !== "/") {
@@ -45,7 +46,10 @@ function generateDjangoFiles(base, name, relative = "/") {
   );
 
   const appsFileData = fs.readFileSync(`${innerAppPath}/apps.py`, "utf8");
-  const result = appsFileData.replace(/name = '.*'/, `name = 'modules.django_${sanitizedName}.${sanitizedName}'`);
+  const result = appsFileData.replace(
+    /name = '.*'/,
+    `name = 'modules.django_${sanitizedName}.${sanitizedName}'`
+  );
   fs.writeFileSync(`${innerAppPath}/apps.py`, result, "utf8");
 
   fs.writeFileSync(
@@ -60,7 +64,77 @@ function generateDjangoFiles(base, name, relative = "/") {
   );
 }
 
-export function createModule(name, type, target, gitRoot) {
+const isNameValid = (name) => {
+  const pattern = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+  return pattern.test(name);
+};
+
+export async function createModule(
+  initialName,
+  initialType,
+  target,
+  initialSearchDescription,
+  initialAcceptanceCriteria,
+  gitRoot
+) {
+  let name, type, searchDescription, acceptanceCriteria;
+
+  if (initialName) {
+    name = initialName;
+  } else {
+    const { inputName } = await inquirer.prompt({
+      message: "Module Name:",
+      name: "inputName",
+      type: "input"
+    });
+
+    name = inputName;
+  }
+
+  if (initialType) {
+    type = initialType;
+  } else {
+    const { inputType } = await inquirer.prompt({
+      message: "Module Type:",
+      name: "inputType",
+      type: "list",
+      choices: ["all", "react-native", "django"]
+    });
+
+    type = inputType;
+  }
+
+  if (!name) {
+    invalid("missing required argument: --name");
+  }
+  if (!type) {
+    invalid("missing required argument: --type");
+  }
+  if (!isNameValid(name)) {
+    invalid(
+      `invalid module name provided: '${name}'. Use only alphanumeric characters, dashes and underscores.`
+    );
+  }
+
+  if (!initialName) {
+    const { inputSearchDescription, inputAcceptanceCriteria } =
+      await inquirer.prompt([
+        {
+          message: "Search Description:",
+          name: "inputSearchDescription",
+          type: "editor"
+        },
+        {
+          message: "Acceptance Criteria:",
+          name: "inputAcceptanceCriteria",
+          type: "editor"
+        }
+      ]);
+
+    searchDescription = inputSearchDescription;
+    acceptanceCriteria = inputAcceptanceCriteria;
+  }
+
   const cwd = process.cwd();
 
   if (target) {
@@ -83,7 +157,7 @@ export function createModule(name, type, target, gitRoot) {
   const dir = path.join(target, slug);
   if (existsSync(dir)) invalid(`module named "${slug}" already exists`);
 
-  const meta = generateMeta(name, type);
+  const meta = generateMeta(name, type, searchDescription, acceptanceCriteria);
 
   try {
     fs.mkdirSync(dir, { recursive: true });
