@@ -69,14 +69,12 @@ const isNameValid = (name) => {
   return pattern.test(name);
 };
 
-export async function createModule(
+const getValidModuleInputs = async (
   initialName,
   initialType,
-  target,
   initialSearchDescription,
-  initialAcceptanceCriteria,
-  gitRoot
-) {
+  initialAcceptanceCriteria
+) => {
   let name, type, searchDescription, acceptanceCriteria;
 
   if (initialName) {
@@ -117,23 +115,50 @@ export async function createModule(
   }
 
   if (!initialName) {
+    section(
+      "The following fields help Crowdbotics match this module to application features. Please enter the following values (these can be updated later in the meta.json file, or in the Crowdbotics platform):"
+    );
     const { inputSearchDescription, inputAcceptanceCriteria } =
       await inquirer.prompt([
         {
           message: "Search Description:",
           name: "inputSearchDescription",
-          type: "editor"
+          type: "input",
+          default: initialSearchDescription || undefined
         },
         {
           message: "Acceptance Criteria:",
           name: "inputAcceptanceCriteria",
-          type: "editor"
+          type: "input",
+          default: initialAcceptanceCriteria || undefined
         }
       ]);
 
     searchDescription = inputSearchDescription;
     acceptanceCriteria = inputAcceptanceCriteria;
+  } else {
+    searchDescription = initialSearchDescription;
+    acceptanceCriteria = initialAcceptanceCriteria;
   }
+
+  return { name, type, searchDescription, acceptanceCriteria };
+};
+
+export async function createModule(
+  initialName,
+  initialType,
+  target,
+  initialSearchDescription,
+  initialAcceptanceCriteria,
+  gitRoot
+) {
+  const { name, type, searchDescription, acceptanceCriteria } =
+    await getValidModuleInputs(
+      initialName,
+      initialType,
+      initialSearchDescription,
+      initialAcceptanceCriteria
+    );
 
   const cwd = process.cwd();
 
