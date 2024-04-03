@@ -28,13 +28,7 @@ import { info } from "./scripts/info.js";
 import { removeModules } from "./scripts/remove.js";
 import { commitModules } from "./scripts/commit-module.js";
 import { upgradeScaffold } from "./scripts/upgrade.js";
-import {
-  valid,
-  invalid,
-  isNameValid,
-  section,
-  isUserEnvironment
-} from "./utils.js";
+import { valid, invalid, section, isUserEnvironment } from "./utils.js";
 import { createModule } from "./scripts/create.js";
 import { login } from "./scripts/login.js";
 import { configFile } from "./scripts/utils/configFile.js";
@@ -182,27 +176,24 @@ const commands = {
     const args = arg({
       "--name": String,
       "--type": String,
-      "--target": String
+      "--target": String,
+      "--search-description": String,
+      "--acceptance-criteria": String
     });
-
-    if (!args["--name"]) {
-      invalid("missing required argument: --name");
-    }
-    if (!args["--type"]) {
-      invalid("missing required argument: --type");
-    }
-    if (!isNameValid(args["--name"])) {
-      invalid(
-        `invalid module name provided: '${args["--name"]}'. Use only alphanumeric characters, dashes and underscores.`
-      );
-    }
 
     analytics.sendEvent({
       name: EVENT.CREATE_MODULE,
       properties: { Name: args["--name"] }
     });
 
-    createModule(args["--name"], args["--type"], args["--target"], gitRoot());
+    createModule(
+      args["--name"],
+      args["--type"],
+      args["--target"],
+      args["--search-description"],
+      args["--acceptance-criteria"],
+      gitRoot()
+    );
   },
   commit: () => {
     const args = arg({

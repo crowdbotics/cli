@@ -68,7 +68,12 @@ export const packageJson = (name) => `{
 /**
  * Miscellaneous
  */
-export function generateMeta(name, type) {
+export function generateMeta(
+  name,
+  type,
+  searchDescription,
+  acceptanceCriteria
+) {
   const rootMap = {
     all: "/",
     "react-native": `/modules/${name}`,
@@ -78,6 +83,8 @@ export function generateMeta(name, type) {
   const meta = {
     title: name,
     description: "",
+    search_description: searchDescription || "",
+    acceptance_criteria: acceptanceCriteria || "",
     root: rootMap[type],
     schema: {}
   };
