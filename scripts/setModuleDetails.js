@@ -7,8 +7,6 @@ export const setModuleDetails = async (
 ) => {
   const patchBody = {};
 
-  section("To ensure the entire string is saved, please use double quotes around the string value.");
-
   if (name) {
     patchBody.title = name;
   }
@@ -22,7 +20,7 @@ export const setModuleDetails = async (
     patchBody.acceptance_criteria = acceptanceCriteria;
   }
   if (Object.keys(patchBody).length === 0) {
-    invalid("No module details was provided to update. Did you mean to include a value?");
+    invalid(" No module details were provided for the update. To correctly save the new value, please enclose it in double quotes. For example, use --description \"Your detailed description here\".");
     return;
   }
   const patchSpinner = ora(
