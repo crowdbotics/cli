@@ -21,25 +21,24 @@ export const setModuleDetails = async (
   if (acceptanceCriteria) {
     patchBody.acceptance_criteria = acceptanceCriteria;
   }
-
+  if (Object.keys(patchBody).length === 0) {
+    invalid("No module details was provided to update. Did you mean to include a value?");
+    return;
+  }
   const patchSpinner = ora(
     "Updating module details."
   ).start();
 
-  try {
-    const patchResponse = await apiClient.patch({
-      path: `/v1/catalog/module/${id}`,
-      body: patchBody
-    });
+  const patchResponse = await apiClient.patch({
+    path: `/v1/catalog/module/${id}`,
+    body: patchBody
+  }).then(patchSpinner.stop());
 
-    if (patchResponse.ok) {
-      patchSpinner.stop();
-      valid(`Module details updated for ${id}.`);
-    } else {
-      patchSpinner.stop();
-      invalid(`Unable to update module details for ${id}. Please try again.`);
-    }
-  } catch (error) {
-    invalid(`An error occurred: ${error.message}. Please try again.`);
+  if (patchResponse.ok) {
+    valid(`Module details updated for ${id}.`);
+  } else if (patchResponse.status === 404) {
+    invalid(`Cannot find requested module with id ${id}.`);
+  } else {
+    invalid("Unable to update modules details. Please try again later.");
   }
 };
