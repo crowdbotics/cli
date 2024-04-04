@@ -1,5 +1,5 @@
 import ora from "ora";
-import { invalid, section, valid } from "../utils.js";
+import { invalid, valid } from "../utils.js";
 import { apiClient } from "./utils/apiClient.js";
 
 export const setModuleDetails = async (
