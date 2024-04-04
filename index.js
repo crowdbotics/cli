@@ -45,6 +45,7 @@ import { HAS_ASKED_OPT_IN_NAME } from "./scripts/analytics/config.js";
 import { EVENT } from "./scripts/analytics/constants.js";
 import { askOptIn } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
+import { setModuleDetails } from "./scripts/setModuleDetails.js";
 
 const pkg = JSON.parse(
   fs.readFileSync(new URL("package.json", import.meta.url), "utf8")
@@ -308,6 +309,7 @@ demo`;
 
     let id;
     const action = args._[1];
+    let extraArgs;
 
     if (!action.length) {
       // TODO - Print help?
@@ -336,6 +338,31 @@ demo`;
         }
 
         await modulesGet(id);
+        break;
+
+      case "set":
+        id = args._[2];
+        extraArgs = args._[3];
+
+        if (!id) {
+          return invalid(
+            "Please provide the id of the module to change info for, i.e. modules archive <123>"
+          );
+        }
+
+        if (!extraArgs) {
+          return invalid(
+            "Please provide the details to change for the module, available options --name, --description, --acceptance-criteria, & --search-description"
+          );
+        }
+
+        await setModuleDetails(id, {
+          name: args["--name"],
+          description: args["--description"],
+          acceptanceCriteria: args["--acceptance-criteria"],
+          searchDescription: args["--search-description"]
+        });
+
         break;
 
       case "archive":
