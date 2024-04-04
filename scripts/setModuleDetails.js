@@ -1,11 +1,13 @@
 import ora from "ora";
-import { invalid, valid } from "../utils.js";
+import { invalid, section, valid } from "../utils.js";
 import { apiClient } from "./utils/apiClient.js";
 
 export const setModuleDetails = async (
   id, name, description, searchDescription, acceptanceCriteria
 ) => {
   const patchBody = {};
+
+  section("To ensure the entire string is saved, please use double quotes around the string value.");
 
   if (name) {
     patchBody.title = name;

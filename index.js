@@ -313,7 +313,6 @@ demo`;
 
     let id;
     const action = args._[1];
-    let extraArgs;
 
     if (!action.length) {
       // TODO - Print help?
@@ -346,17 +345,10 @@ demo`;
 
       case "set":
         id = args._[2];
-        extraArgs = args._[3];
 
         if (!id) {
           return invalid(
             "Please provide the id of the module to change info for, i.e. modules set <123>"
-          );
-        }
-
-        if (!extraArgs) {
-          return invalid(
-            "Please provide the details to change for the module, available options --name, --description, --acceptance-criteria, & --search-description"
           );
         }
 
@@ -440,6 +432,9 @@ Commands available:
   demo     Generate a local React Native and Django demo app
   add      Install a module in the demo app
   remove   Remove a module from the demo app
+  get      Get information about a module by id
+  set      Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>".
+  create   Create a new module of a given type
   create   Create a new module of a given type
   commit   Update an existing module from the demo source code
   init     Initialize a blank modules repository
@@ -482,7 +477,8 @@ Get information about a module by id:
   cb modules get <module-id>
 
 Set information about a module by id such as name, description, acceptance criteria, and search description:
-  cb modules set <module-id> --name <name> --description <description> --acceptance-criteria <acceptance-criteria> --search-description <search-description>
+  cb modules set <module-id> --name "<name>" --description "<description>" --acceptance-criteria "<acceptance-criteria>" --search-description "<search-description>"
+  The new values must be wrapped in quotes "<value>".
 
 Install modules from other directory:
   cb add --source ../other-repository <module-name>
