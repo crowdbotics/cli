@@ -3,8 +3,7 @@ import { invalid, valid } from "../utils.js";
 import { apiClient } from "./utils/apiClient.js";
 
 export const setModuleDetails = async (
-  id,
-  { name, description, searchDescription, acceptanceCriteria }
+  id, name, description, searchDescription, acceptanceCriteria
 ) => {
   const patchBody = {};
 
@@ -20,19 +19,25 @@ export const setModuleDetails = async (
   if (acceptanceCriteria) {
     patchBody.acceptance_criteria = acceptanceCriteria;
   }
+
   const patchSpinner = ora(
     "Updating module details."
   ).start();
 
-  const patchResponse = await apiClient.patch({
-    path: `/v1/catalog/module/${id}`,
-    body: patchBody
-  });
+  try {
+    const patchResponse = await apiClient.patch({
+      path: `/v1/catalog/module/${id}`,
+      body: patchBody
+    });
 
-  if (patchResponse.ok) {
-    valid(`Module details updated for ${id}.`);
-  } else {
-    invalid(`Unable to update module details for ${id}.`);
+    if (patchResponse.ok) {
+      patchSpinner.stop();
+      valid(`Module details updated for ${id}.`);
+    } else {
+      patchSpinner.stop();
+      invalid(`Unable to update module details for ${id}. Please try again.`);
+    }
+  } catch (error) {
+    invalid(`An error occurred: ${error.message}. Please try again.`);
   }
-  patchSpinner.stop();
 };

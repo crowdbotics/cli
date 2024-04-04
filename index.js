@@ -304,7 +304,11 @@ demo`;
       "--visibility": String,
       "--status": String,
       "--page": String,
-      "--unarchive": Boolean
+      "--unarchive": Boolean,
+      "--name": String,
+      "--description": String,
+      "--acceptance-criteria": String,
+      "--search-description": String
     });
 
     let id;
@@ -346,7 +350,7 @@ demo`;
 
         if (!id) {
           return invalid(
-            "Please provide the id of the module to change info for, i.e. modules archive <123>"
+            "Please provide the id of the module to change info for, i.e. modules set <123>"
           );
         }
 
@@ -356,12 +360,12 @@ demo`;
           );
         }
 
-        await setModuleDetails(id, {
-          name: args["--name"],
-          description: args["--description"],
-          acceptanceCriteria: args["--acceptance-criteria"],
-          searchDescription: args["--search-description"]
-        });
+        await setModuleDetails(id,
+          args["--name"],
+          args["--description"],
+          args["--acceptance-criteria"],
+          args["--search-description"]
+        );
 
         break;
 
@@ -473,6 +477,12 @@ Install one or modules to your demo app:
 
 Remove one or modules from your demo app:
   cb remove <module-name> <module-name-2>
+
+Get information about a module by id:
+  cb modules get <module-id>
+
+Set information about a module by id such as name, description, acceptance criteria, and search description:
+  cb modules set <module-id> --name <name> --description <description> --acceptance-criteria <acceptance-criteria> --search-description <search-description>
 
 Install modules from other directory:
   cb add --source ../other-repository <module-name>
