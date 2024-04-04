@@ -20,7 +20,7 @@ export const setModuleDetails = async (
     patchBody.acceptance_criteria = acceptanceCriteria;
   }
   if (Object.keys(patchBody).length === 0) {
-    invalid(" No module details were provided for the update. To correctly save the new value, please enclose it in double quotes. For example, use --description \"Your detailed description here\".");
+    invalid("No module details were provided for the update. To correctly save the new value, please enclose it in double quotes. For example, use --description \"Your detailed description here\".");
     return;
   }
   const patchSpinner = ora(
