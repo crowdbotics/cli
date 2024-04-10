@@ -1,0 +1,67 @@
+name: Create Package Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionType:
+        type: choice
+        description: 'Release Type'
+        options:
+          - minor
+          - major
+        required: true
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Setup Git
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+
+    ## Update the package json to either a major or minor version depending on the selection
+
+    - name: Upgrade yarn with major version
+      if: ${{ github.event.inputs.versionType == 'major' }}
+      run: |
+        yarn version --major --no-git-tag-version
+        git add package.json
+
+    - name: Upgrade yarn with minor version
+      if: ${{ github.event.inputs.versionType == 'minor' }}
+      run: |
+        yarn version --minor --no-git-tag-version
+        git add package.json
+
+    # Create release branch off of main with the new version number in the branch name
+    - name: Create Release Branch
+      run: |
+        NEW_VERSION=$(npm pkg get version | tr -d '"') # Trim quotes wrapping command output
+        TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+        BRANCH_NAME="release-changes-${NEW_VERSION}-${TIMESTAMP}"
+        git checkout -b $BRANCH_NAME
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+    # Commit the changes of the package.json version increment. Format the commit message to be Release x.y.z so it's picked up by the publish action.
+    - name: Commit Release Changes
+      run: |
+        git commit -m "Release ${{ env.NEW_VERSION }}"
+        git push origin HEAD
+
+    # Create a pull request so it can be merged back into main.
+    - name: Create Pull Request
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ${{ env.BRANCH_NAME }}
+        destination_branch: "main"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        pr_title: "Release CLI: Version ${{ env.NEW_VERSION }}"
+        pr_body: "Automated pull request to release the latest version of the CLI."
+        pr_label: "automated-pr"
