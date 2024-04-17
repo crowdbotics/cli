@@ -5,7 +5,22 @@ import { section, generateCommand } from "../utils.js";
 import { execSync } from "child_process";
 import { configurePython, execOptions } from "./utils/environment.js";
 
-export function createDemo(dir, yaml) {
+const config = {
+  project_name: "demo",
+  project_slug: "demo",
+  project_generated_name: "demo",
+  owner_email: "demo@crowdbotics.com",
+  custom_domain: "demo.botics.co",
+  repo_url: "https://github.com/crowdbotics/modules",
+  heroku_dyno_size: "free",
+  is_mobile: "y"
+};
+
+const extraContext = Object.entries(config)
+  .map((cur) => `${cur[0]}=${cur[1]}`)
+  .join(" ");
+
+export function createDemo(dir) {
   const options = Object.assign(execOptions, {
     cwd: path.dirname(dir)
   });
@@ -25,8 +40,8 @@ export function createDemo(dir, yaml) {
     "gh:crowdbotics/react-native-scaffold",
     "--directory dist/cookie",
     "--checkout master",
-    `--config-file ${yaml}`,
-    "--no-input"
+    "--no-input",
+    extraContext
   ]);
   execSync(rnCookieCutterCommand, options);
 
@@ -42,9 +57,9 @@ export function createDemo(dir, yaml) {
     "pipenv run cookiecutter",
     "gh:crowdbotics/django-scaffold",
     "--checkout master",
-    `--config-file ${yaml}`,
     `--output-dir ${path.basename(dir)}`,
-    "--no-input"
+    "--no-input",
+    extraContext
   ]);
   execSync(djangoCookieCutterCommand, options);
   fse.moveSync(path.join(dir, path.basename(dir)), path.join(dir, "backend"));
