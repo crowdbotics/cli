@@ -2,6 +2,36 @@
 
 Based on [Common Changelog](https://common-changelog.org/).
 
+## 3.0.2 - 2024-04-17
+
+### Fixed
+
+Fixed issues with `cookiecutter` commands not the finding `cookiecutter.yaml` file.
+
+The file got removed and the configuration is now instead injected directly in the command arguments. The `demo` command should now be much more reliable across all combinations of operating system/package manager of choice.
+
+## 3.0.1 - 2024-03-27
+
+### Changed
+
+The repository has moved from [crowdbotics/modules](https://github.com/crowdbotics/modules) to [crowdbotics/cli](https://github.com/crowdbotics/cli).
+
+## 3.0.0-canary - 2024-03-21
+
+_The project has been published to npm under the name ["crowdbotics"](https://www.npmjs.com/package/crowdbotics)._
+
+### Changed
+
+You can now install it directly:
+```
+npm install -g crowdbotics
+```
+
+And run it with the `cb` binary:
+```
+cb help
+```
+
 ## 2.4.0 - 2023-12-21
 
 ### Added
