@@ -58,7 +58,7 @@ const gitRoot = () => {
   } catch {
     invalid(
       `This command must be executed inside a git repository.
-Visit our official documentation for more information and try again: https://docs.crowdbotics.com/creating-reusable-modules`
+Visit our official documentation for more information and try again: https://docs.crowdbotics.com`
     );
   }
 };
@@ -398,65 +398,94 @@ demo`;
     console.log(`usage: cb <command>
 
 Commands available:
-  parse    Parse and validate your modules
-  demo     Generate a local React Native and Django demo app
-  add      Install a module in the demo app
-  remove   Remove a module from the demo app
-  create   Create a new module of a given type
-  commit   Update an existing module from the demo source code
-  init     Initialize a blank modules repository
-  upgrade  Upgrade your existing app's scaffold to the latest version
-  help     Show this help page
-  feedback Send feedback to Crowdbotics to let us know how we're doing
-  login    Login to your Crowdbotics account. Requires 2FA authentication
-  logout   Logout of your Crowdbotics account
-  publish  Publish your modules to your organization's private catalog
-  modules  Manage modules for your organization
 
-Parse and validate your modules:
-  cb parse --source <path>
+  add:      Installs one or more modules into your Demo app.
+  commit:   Updates the definition of an existing module.
+  create:   Creates a new module of a specific type.
+  init:     Initializes a new blank modules repository.
+  login:    Logs in to your Crowdbotics account.
+  logout:   Logs out of your Crowdbotics account.
+  modules:  Manages modules for your organization.
+  parse:    Parses and validates module definitions.
+  publish:  Publishes your modules to your organization's private catalog. When run, this command prompts for more information.
+  remove:   Removes one or more modules from your Demo app.
+  upgrade:  Upgrades your existing app's scaffold to the latest version or a specific version.
 
-Parse modules and write the data to a json file:
-  cb parse --source <path> --write <path>
+--------------------
+More details
+--------------------
 
-Create a demo app:
-  cb demo
+add: Installs one or more modules into your Demo app.
+    Arguments:
+        --source: (Optional) Specifies the source directory for modules (defaults to the Crowdbotics modules directory based on package location).  
+        --project: (Optional) Specifies the project directory to install modules into (defaults to the git root of the current working directory).
+    Parameters: 
+        <module1> <module2>: Names of the modules to install (required).
+    Example: cb add module1 module2
 
-Create a module of a given type:
-  cb create --name <module-name> --type <all/react-native/django>
+commit: Updates the definition of an existing module.
+    Arguments:
+        --source: (Optional) Specifies the source directory for modules (defaults to the current working directory).
+    Parameters: 
+        <module1> <module2>: Names of the modules to update (required).
+    Example: cb commit module1
 
-Initialize a modules repository:
-  cb init --name <my-modules-repository-name>
+create: Creates a new module of a specific type.
+    Arguments:
+        --target: (Optional) Specifies the target directory for creating the module (defaults to the modules directory within the git root).
+    Parameters:
+        --name <name>: Name for the new module (required).  
+        --type <type>: Type of module to create (e.g., react-native) (required).
+    Example: cb create --name myModule --type react-native
 
-Upgrade your scaffold to the latest master:
-  cb upgrade
+init: Initializes a new blank modules repository.
+    Arguments:
+        --name <project-name>: Specifies the name of the new project directory to create.
+    Example: cb init --name my-modules
 
-Upgrade your scaffold to a specific version (git tag, git commit or branch name):
-  cb upgrade --version 2.3.0
+login: Logs in to your Crowdbotics account.
+    Example: cb login
 
-Install one or modules to your demo app:
-  cb add <module-name> <module-name-2>
+logout: Logs out of your Crowdbotics account.
+    Example: cb logout
 
-Remove one or modules from your demo app:
-  cb remove <module-name> <module-name-2>
+modules: Manages modules for your organization.
+    Arguments:
+        --search: (Optional) Searches for modules by name or description.   
+        --visibility: (Optional) Filters modules by visibility (private or public). 
+        --status: (Optional) Filters modules by status (published or archived). 
+        --page: (Optional) Specifies the page number for paginated results. 
+        --unarchive: (Optional) Flag to unarchive an archived module.
+    Parameters:
+        list: Lists available modules (optional subcommand).
+        get <id>: Gets details for a specific module by its ID (required subcommand with parameter).
+        archive <id>: Archives a specific module by its ID (required subcommand with parameter).
+        help: Shows help for the modules command (optional subcommand).
+    Example: 
 
-Install modules from other directory:
-  cb add --source ../other-repository <module-name>
+parse: Parses and validates module definitions.
+    Arguments:
+        --source: (Optional) Specifies the source directory for the module definition file. 
+        --write: (Optional) Specifies the output file path to write the parsed data.
+    Parameters: 
+        <--source> (required if no argument is provided) or <file>: Path to the module definition file.
+    Example:  cb parse --source ./modules
 
-Install modules to other app that is not "demo":
-  cb add --project ../other-project <module-name>
+publish: Publishes your modules to your organization's private catalog. When run, this command prompts for more information.
+    Example: cb publish
 
-Remove modules from app that is not "demo":
-  cb remove --project ../other-project <module-name>
+remove: Removes one or more modules from your Demo app.
+    Arguments:
+        --source: (Optional) Specifies the source directory for modules (defaults to the Crowdbotics modules directory based on package location).  
+        --project: (Optional) Specifies the project directory to remove modules from (defaults to the git root of the current working directory).
+    Parameters: 
+        <module1> <module2>: Names of the modules to remove (required).
+    Example: cb remove module1 module2
 
-Update a module definition from the demo app:
-  cb commit <module-name>
-
-Update a module definition from other app:
-  cb commit <module-name> --source <path>
-
-Glossary:
-  <module-name> stands for the name of the directory where the module is defined.
+upgrade: Upgrades your existing app's scaffold to the latest version or a specific version.
+    Arguments:
+        --version: (Optional) Specifies the version to upgrade to. 
+    Example: cb upgrade --version 2.3.0
 `);
   }
 };
