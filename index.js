@@ -28,13 +28,7 @@ import { info } from "./scripts/info.js";
 import { removeModules } from "./scripts/remove.js";
 import { commitModules } from "./scripts/commit-module.js";
 import { upgradeScaffold } from "./scripts/upgrade.js";
-import {
-  valid,
-  invalid,
-  isNameValid,
-  section,
-  isUserEnvironment
-} from "./utils.js";
+import { valid, invalid, section, isUserEnvironment } from "./utils.js";
 import { createModule } from "./scripts/create.js";
 import { login } from "./scripts/login.js";
 import { configFile } from "./scripts/utils/configFile.js";
@@ -51,6 +45,7 @@ import { HAS_ASKED_OPT_IN_NAME } from "./scripts/analytics/config.js";
 import { EVENT } from "./scripts/analytics/constants.js";
 import { askOptIn } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
+import { setModuleDetails } from "./scripts/setModuleDetails.js";
 
 const gitRoot = () => {
   try {
@@ -166,27 +161,24 @@ const commands = {
     const args = arg({
       "--name": String,
       "--type": String,
-      "--target": String
+      "--target": String,
+      "--search-description": String,
+      "--acceptance-criteria": String
     });
-
-    if (!args["--name"]) {
-      invalid("missing required argument: --name");
-    }
-    if (!args["--type"]) {
-      invalid("missing required argument: --type");
-    }
-    if (!isNameValid(args["--name"])) {
-      invalid(
-        `invalid module name provided: '${args["--name"]}'. Use only alphanumeric characters, dashes and underscores.`
-      );
-    }
 
     analytics.sendEvent({
       name: EVENT.CREATE_MODULE,
       properties: { Name: args["--name"] }
     });
 
-    createModule(args["--name"], args["--type"], args["--target"], gitRoot());
+    createModule(
+      args["--name"],
+      args["--type"],
+      args["--target"],
+      args["--search-description"],
+      args["--acceptance-criteria"],
+      gitRoot()
+    );
   },
   commit: () => {
     const args = arg({
@@ -296,7 +288,11 @@ demo`;
       "--visibility": String,
       "--status": String,
       "--page": String,
-      "--unarchive": Boolean
+      "--unarchive": Boolean,
+      "--name": String,
+      "--description": String,
+      "--acceptance-criteria": String,
+      "--search-description": String
     });
 
     let id;
@@ -329,6 +325,24 @@ demo`;
         }
 
         await modulesGet(id);
+        break;
+
+      case "set":
+        id = args._[2];
+
+        if (!id) {
+          return invalid(
+            "Please provide the id of the module to change info for, i.e. modules set <123>"
+          );
+        }
+
+        await setModuleDetails(id,
+          args["--name"],
+          args["--description"],
+          args["--acceptance-criteria"],
+          args["--search-description"]
+        );
+
         break;
 
       case "archive":
@@ -402,6 +416,9 @@ Commands available:
   demo     Generate a local React Native and Django demo app
   add      Install a module in the demo app
   remove   Remove a module from the demo app
+  get      Get information about a module by id
+  set      Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>".
+  create   Create a new module of a given type
   create   Create a new module of a given type
   commit   Update an existing module from the demo source code
   init     Initialize a blank modules repository
@@ -439,6 +456,13 @@ Install one or modules to your demo app:
 
 Remove one or modules from your demo app:
   cb remove <module-name> <module-name-2>
+
+Get information about a module by id:
+  cb modules get <module-id>
+
+Set information about a module by id such as name, description, acceptance criteria, and search description:
+  cb modules set <module-id> --name "<name>" --description "<description>" --acceptance-criteria "<acceptance-criteria>" --search-description "<search-description>"
+  The new values must be wrapped in quotes "<value>".
 
 Install modules from other directory:
   cb add --source ../other-repository <module-name>
