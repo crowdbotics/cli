@@ -107,14 +107,9 @@ async function dispatcher() {
 
 const commands = {
   demo: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.PipEnv
-    ]);
     createDemo(
       path.join(gitRoot(), "demo"),
-      path.join(sourceDir, "cookiecutter.yaml")
-    );
+      "PLAT-13615", // TODO: change this before merging. Check if we can use environment variables
     valid("demo app successfully generated");
   },
   parse: () => {
@@ -169,10 +164,7 @@ const commands = {
     removeModules(modules, args["--source"], args["--project"], gitRoot());
   },
   create: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.CookieCutter
-    ]);
+    validateEnvironmentDependencies([EnvironmentDependency.Python]);
 
     const args = arg({
       "--name": String,
@@ -352,7 +344,8 @@ demo`;
           );
         }
 
-        await setModuleDetails(id,
+        await setModuleDetails(
+          id,
           args["--name"],
           args["--description"],
           args["--acceptance-criteria"],
