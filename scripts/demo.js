@@ -9,6 +9,8 @@ async function downloadAndExtract(url, target) {
   const rnResponse = await fetch(url);
   if (rnResponse.ok && rnResponse.body) {
     rnResponse.body.pipe(unzipper.Extract({ path: target }));
+  } else {
+    throw new Error("Failed to download scaffold for demo app.");
   }
 }
 

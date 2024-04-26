@@ -106,10 +106,14 @@ async function dispatcher() {
 }
 
 const commands = {
-  demo: () => {
-    createDemo(
-      path.join(gitRoot(), "demo"),
-      "PLAT-13615", // TODO: change this before merging. Check if we can use environment variables
+  demo: async () => {
+    const args = arg({
+      "--source": String
+    });
+
+    const { "--source": source = "master" } = args;
+
+    await createDemo(path.join(gitRoot(), "demo"), source);
     valid("demo app successfully generated");
   },
   parse: () => {
