@@ -41,9 +41,9 @@ import {
   EnvironmentDependency
 } from "./scripts/utils/environment.js";
 import { analytics } from "./scripts/analytics/wrapper.js";
-import { HAS_ASKED_OPT_IN_NAME } from "./scripts/analytics/config.js";
+import { HAS_ASKED_OPT_IN_NAME, OPT_IN_NAME } from "./scripts/analytics/config.js";
 import { EVENT } from "./scripts/analytics/constants.js";
-import { askOptIn } from "./scripts/analytics/scripts.js";
+import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
 
@@ -75,9 +75,9 @@ async function dispatcher() {
   const useDefaults = process.env.npm_config_yes;
 
   // check config if they have been asked opted in or out of amplitude
-  const hasAskedOptIn = configFile.get(HAS_ASKED_OPT_IN_NAME) || false;
-  if (!hasAskedOptIn && isUserEnvironment && !useDefaults) {
-    await askOptIn();
+  const isInitialLogin = configFile.get(HAS_ASKED_OPT_IN_NAME) || false;
+  if (!isInitialLogin && isUserEnvironment && !useDefaults) {
+    await configureInitialLogin();
   }
 
   const command = process.argv[2];
@@ -423,7 +423,22 @@ demo`;
         sendFeedback(action);
     }
   },
-
+  optout: () => {
+    if (!configFile.get(OPT_IN_NAME)) {
+      console.log("You are already opted out for analytics");
+      return;
+    }
+    configFile.set(OPT_IN_NAME, false);
+    valid("Successfully opted out of analytics");
+  },
+  optin: () => {
+    if (configFile.get(OPT_IN_NAME)) {
+      console.log("You are already opted in for analytics");
+      return;
+    }
+    configFile.set(OPT_IN_NAME, true);
+    valid("Successfully opted in of analytics");
+  },
   help: () => {
     console.log(`usage: cb <command>
 
@@ -445,6 +460,8 @@ Commands available:
   logout   Logout of your Crowdbotics account
   publish  Publish your modules to your organization's private catalog
   modules  Manage modules for your organization
+  optin    Opt in for Crowdbotics analytics
+  optout   Opt out for Crowdbotics analytics
 
 Parse and validate your modules:
   cb parse --source <path>
