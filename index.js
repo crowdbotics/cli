@@ -499,7 +499,11 @@ Glossary:
 };
 
 try {
-  dispatcher();
+  dispatcher().catch((error) => {
+    sentryMonitoring.captureException(error);
+    invalid(error);
+  });
 } catch (err) {
+  sentryMonitoring.captureException(err);
   invalid(err);
 }
