@@ -67,6 +67,13 @@ async function dispatcher() {
     await configureInitialLogin();
   }
 
+  // Compulsory dependencies check on each command
+  // Note: This is a forced check, so no cache is used
+  // consider performance implications when adding new dependencies
+  validateEnvironmentDependencies([
+    EnvironmentDependency.CLI
+  ], true, false);
+
   const command = process.argv[2];
 
   if (!command) {

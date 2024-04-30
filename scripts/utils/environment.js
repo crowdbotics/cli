@@ -1,5 +1,5 @@
 import { execSync, spawnSync } from "node:child_process";
-import { invalid, section, valid } from "../../utils.js";
+import { compareVersions, invalid, section, valid, warn } from "../../utils.js";
 import { configFile } from "./configFile.js";
 
 const ENVIRONMENT_VERSIONS_CONFIG_NAME = "environment-versions";
@@ -14,7 +14,8 @@ export const EnvironmentDependency = {
   Git: "git",
   Python: "python",
   PipEnv: "pipenv",
-  CookieCutter: "cookiecutter"
+  CookieCutter: "cookiecutter",
+  CLI: "cli"
 };
 
 /**
@@ -92,7 +93,44 @@ export function getEnvironmentVersions(dependencies) {
     });
 
     if (!cookiecutter.stderr && !cookiecutter.error) {
-      environmentVersions.cookiecutter = cookiecutter.stdout;
+      environmentVersions.cookiecutter = cookiecutter.stdout.trim();
+    }
+  }
+
+  if (EnvironmentDependency.CLI) {
+    const registryResult = spawnSync("npm view crowdbotics --json", {
+      cwd: userdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: 2000 // 2 second to keep the CLI working without internet
+    });
+
+    const localCLIResult = spawnSync("npm list -g crowdbotics --depth=0", {
+      cwd: userdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: 2000
+    });
+
+    if (!registryResult.stderr && !registryResult.error) {
+      const result = JSON.parse(registryResult.stdout);
+      environmentVersions.cli = {
+        registry: {
+          version: result?.version,
+          latest: result?.["dist-tags"]?.latest,
+          lastChecked: new Date().toISOString()
+        }
+      };
+    }
+
+    if (!localCLIResult.stderr && !localCLIResult.error) {
+      const localCLI = localCLIResult.stdout.match(/crowdbotics@([0-9.]+)/);
+      environmentVersions.cli = {
+        ...environmentVersions.cli,
+        local: {
+          version: localCLI[1] || "Not installed"
+        }
+      };
     }
   }
 
@@ -105,11 +143,16 @@ export function validateEnvironmentDependencies(
     EnvironmentDependency.Git,
     EnvironmentDependency.Python,
     EnvironmentDependency.PipEnv,
-    EnvironmentDependency.CookieCutter
+    EnvironmentDependency.CookieCutter,
+    EnvironmentDependency.CLI
   ],
-  force = false
+  force = false,
+  showTitle = true
 ) {
-  section("Checking environment compatibility");
+  // We don't always want to show the title for future silent validations
+  if (showTitle) {
+    section("Checking environment compatibility");
+  }
 
   const configValues = configFile.get(ENVIRONMENT_VERSIONS_CONFIG_NAME);
 
@@ -177,6 +220,27 @@ export function validateEnvironmentDependencies(
       printInvalidMessage("cookiecutter is not available in your system");
     } else {
       valid(environmentVersions.cookiecutter);
+    }
+  }
+
+  if (dependencies.includes(EnvironmentDependency.CLI)) {
+    if (!environmentVersions.cli) {
+      printInvalidMessage("cli is not available in your system");
+    } else {
+      if (environmentVersions?.cli?.registry) {
+        const cliVersionMessage = `CLI Version current: ${environmentVersions?.cli?.local?.version} latest: ${environmentVersions?.cli?.registry?.latest}`;
+        const updateVersionMessage = "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
+        const compare = compareVersions(
+          environmentVersions?.cli?.local?.version,
+          environmentVersions?.cli?.registry?.latest
+        );
+        if (compare < 0) {
+          warn(cliVersionMessage);
+          warn(updateVersionMessage);
+        } else {
+          valid(cliVersionMessage);
+        }
+      }
     }
   }
 }
