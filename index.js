@@ -283,6 +283,7 @@ demo`;
 
   modules: async () => {
     const args = arg({
+      "--verbose": Boolean,
       "--search": String,
       "--visibility": String,
       "--status": String,
