@@ -47,19 +47,6 @@ import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
 
-const pkg = JSON.parse(
-  fs.readFileSync(new URL("package.json", import.meta.url), "utf8")
-);
-
-let sourceDir = path.dirname(path.dirname(process.argv[1]));
-if (fs.existsSync(path.join(sourceDir, pkg.name))) {
-  // npx lib directory
-  sourceDir = path.join(sourceDir, pkg.name);
-} else {
-  // npm lib directory
-  sourceDir = path.join(sourceDir, "lib", "node_modules", pkg.name);
-}
-
 const gitRoot = () => {
   try {
     return path.dirname(findGitRoot(process.cwd()));
@@ -111,10 +98,7 @@ const commands = {
       EnvironmentDependency.Python,
       EnvironmentDependency.PipEnv
     ]);
-    createDemo(
-      path.join(gitRoot(), "demo"),
-      path.join(sourceDir, "cookiecutter.yaml")
-    );
+    createDemo(path.join(gitRoot(), "demo"));
     valid("demo app successfully generated");
   },
   parse: () => {
