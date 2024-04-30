@@ -28,7 +28,7 @@ import { info } from "./scripts/info.js";
 import { removeModules } from "./scripts/remove.js";
 import { commitModules } from "./scripts/commit-module.js";
 import { upgradeScaffold } from "./scripts/upgrade.js";
-import { valid, invalid, section, isUserEnvironment } from "./utils.js";
+import { valid, invalid, section, isUserEnvironment, isLoginNotReqCommand } from "./utils.js";
 import { createModule } from "./scripts/create.js";
 import { login } from "./scripts/login.js";
 import { configFile } from "./scripts/utils/configFile.js";
@@ -46,6 +46,7 @@ import { EVENT } from "./scripts/analytics/constants.js";
 import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
+import { isUserLoggedIn } from "./scripts/utils/auth.js";
 
 const pkg = JSON.parse(
   fs.readFileSync(new URL("package.json", import.meta.url), "utf8")
@@ -74,7 +75,7 @@ Visit our official documentation for more information and try again: https://doc
 async function dispatcher() {
   const useDefaults = process.env.npm_config_yes;
 
-  // check config if they have been asked opted in or out of amplitude
+  // check config if the inital login has been done
   const isInitialLogin = configFile.get(HAS_ASKED_OPT_IN_NAME) || false;
   if (!isInitialLogin && isUserEnvironment && !useDefaults) {
     await configureInitialLogin();
@@ -91,6 +92,13 @@ async function dispatcher() {
   }
 
   sentryMonitoring.registerCommandName(command);
+
+  const isLoggedIn = isUserLoggedIn();
+
+  if (!isLoggedIn && !isLoginNotReqCommand(command)) {
+    console.log("We see you are not logged in. Please log in to run Crowdbotics commands");
+    await login();
+  }
 
   await commands[command]();
 

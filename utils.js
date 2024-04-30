@@ -23,3 +23,8 @@ export const section = (...args) => {
 };
 
 export const isUserEnvironment = !process?.env?.CI && !process?.env?.CIRCLE_JOB;
+
+export const isLoginNotReqCommand = (command) => {
+  const allowedCommands = ["help", "logout", "login"];
+  return allowedCommands.includes(command);
+};
