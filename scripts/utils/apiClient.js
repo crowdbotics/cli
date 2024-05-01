@@ -46,7 +46,7 @@ class ApiClient {
       url += "?" + new URLSearchParams(params).toString();
     }
 
-    logger.log("API Request", method, url);
+    logger.verbose("API Request", method, url);
 
     const response = await fetch(url, {
       body: body ? JSON.stringify(body) : undefined,
@@ -58,7 +58,7 @@ class ApiClient {
       method: method
     });
 
-    logger.log(
+    logger.verbose(
       "API Response",
       method,
       url,

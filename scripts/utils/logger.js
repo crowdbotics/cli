@@ -2,10 +2,10 @@ class Logger {
   constructor() {
     this._verboseEnabled = process.argv.includes("--verbose");
 
-    this.log("Verbose mode enabled");
+    this.verbose("Verbose mode enabled");
   }
 
-  log(...messages) {
+  verbose(...messages) {
     if (!this._verboseEnabled) {
       return;
     }

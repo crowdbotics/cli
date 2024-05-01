@@ -40,7 +40,7 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
-    logger.log("Yarn dependency check", yarn);
+    logger.verbose("Yarn dependency check", yarn);
 
     if (!yarn.error && !yarn.stderr) {
       environmentVersions.yarn = formatStdout(yarn.stdout);
@@ -54,7 +54,7 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
-    logger.log("Git dependency check", git);
+    logger.verbose("Git dependency check", git);
 
     if (!git.error && !git.stderr) {
       environmentVersions.git = formatStdout(git.stdout);
@@ -68,7 +68,7 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
-    logger.log("Python dependency check", python);
+    logger.verbose("Python dependency check", python);
 
     if (python.stdout && !python.error && !python.stderr) {
       const versionMatch = python.stdout.match(PYTHON_VERSION_REGEX);
@@ -86,7 +86,7 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
-    logger.log("pipenv dependency check", pipenv);
+    logger.verbose("pipenv dependency check", pipenv);
 
     if (!pipenv.stderr && !pipenv.error) {
       environmentVersions.pipenv = formatStdout(pipenv.stdout);
@@ -100,7 +100,7 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
-    logger.log("Cookiecutter dependency check", cookiecutter);
+    logger.verbose("Cookiecutter dependency check", cookiecutter);
 
     if (!cookiecutter.stderr && !cookiecutter.error) {
       environmentVersions.cookiecutter = cookiecutter.stdout;
@@ -122,7 +122,7 @@ export function validateEnvironmentDependencies(
 ) {
   section("Checking environment compatibility");
 
-  logger.log("Validating environment dependencies", dependencies);
+  logger.verbose("Validating environment dependencies", dependencies);
 
   const configValues = configFile.get(ENVIRONMENT_VERSIONS_CONFIG_NAME);
 
