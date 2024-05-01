@@ -1,6 +1,7 @@
 import { execSync, spawnSync } from "node:child_process";
 import { invalid, section, valid } from "../../utils.js";
 import { configFile } from "./configFile.js";
+import { logger } from "./logger.js";
 
 const ENVIRONMENT_VERSIONS_CONFIG_NAME = "environment-versions";
 const PYTHON_VERSION_REGEX = /Python (3\.[0-9]*)/;
@@ -39,6 +40,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.log("Yarn dependency check", yarn);
+
     if (!yarn.error && !yarn.stderr) {
       environmentVersions.yarn = formatStdout(yarn.stdout);
     }
@@ -51,6 +54,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.log("Git dependency check", git);
+
     if (!git.error && !git.stderr) {
       environmentVersions.git = formatStdout(git.stdout);
     }
@@ -62,6 +67,8 @@ export function getEnvironmentVersions(dependencies) {
       shell: true,
       encoding: "utf8"
     });
+
+    logger.log("Python dependency check", python);
 
     if (python.stdout && !python.error && !python.stderr) {
       const versionMatch = python.stdout.match(PYTHON_VERSION_REGEX);
@@ -79,6 +86,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.log("pipenv dependency check", pipenv);
+
     if (!pipenv.stderr && !pipenv.error) {
       environmentVersions.pipenv = formatStdout(pipenv.stdout);
     }
@@ -90,6 +99,8 @@ export function getEnvironmentVersions(dependencies) {
       shell: true,
       encoding: "utf8"
     });
+
+    logger.log("Cookiecutter dependency check", cookiecutter);
 
     if (!cookiecutter.stderr && !cookiecutter.error) {
       environmentVersions.cookiecutter = cookiecutter.stdout;
@@ -110,6 +121,8 @@ export function validateEnvironmentDependencies(
   force = false
 ) {
   section("Checking environment compatibility");
+
+  logger.log("Validating environment dependencies", dependencies);
 
   const configValues = configFile.get(ENVIRONMENT_VERSIONS_CONFIG_NAME);
 

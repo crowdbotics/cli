@@ -41,11 +41,18 @@ import {
   EnvironmentDependency
 } from "./scripts/utils/environment.js";
 import { analytics } from "./scripts/analytics/wrapper.js";
-import { HAS_ASKED_OPT_IN_NAME, OPT_IN_NAME } from "./scripts/analytics/config.js";
+import {
+  HAS_ASKED_OPT_IN_NAME,
+  OPT_IN_NAME
+} from "./scripts/analytics/config.js";
 import { EVENT } from "./scripts/analytics/constants.js";
 import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
+
+const GLOBAL_ARGS = {
+  "--verbose": Boolean
+};
 
 const gitRoot = () => {
   try {
@@ -105,6 +112,7 @@ const commands = {
   },
   parse: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--write": String
     });
@@ -132,6 +140,7 @@ const commands = {
     ]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--project": String
     });
@@ -145,6 +154,7 @@ const commands = {
     validateEnvironmentDependencies([EnvironmentDependency.Yarn]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--project": String
     });
@@ -158,6 +168,7 @@ const commands = {
     validateEnvironmentDependencies([EnvironmentDependency.Python]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--name": String,
       "--type": String,
       "--target": String,
@@ -181,6 +192,7 @@ const commands = {
   },
   commit: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String
     });
     const modules = args._.slice(1);
@@ -193,6 +205,7 @@ const commands = {
     validateEnvironmentDependencies([EnvironmentDependency.Git]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--name": String
     });
     if (!args["--name"]) {
@@ -230,6 +243,7 @@ demo`;
   },
   upgrade: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--version": String
     });
     analytics.sendEvent({ name: EVENT.UPGRADE });
@@ -245,7 +259,9 @@ demo`;
     info();
   },
   config: () => {
-    const args = arg({});
+    const args = arg({
+      ...GLOBAL_ARGS
+    });
 
     const action = args._[1];
     const key = args._[2];
@@ -283,7 +299,7 @@ demo`;
 
   modules: async () => {
     const args = arg({
-      "--verbose": Boolean,
+      ...GLOBAL_ARGS,
       "--search": String,
       "--visibility": String,
       "--status": String,
@@ -383,7 +399,9 @@ demo`;
   },
 
   feedback: () => {
-    const args = arg({});
+    const args = arg({
+      ...GLOBAL_ARGS
+    });
     const action = args._[1];
 
     if (!action) {
