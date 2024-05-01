@@ -36,7 +36,12 @@ class AnalyticsWrapper {
 
     try {
       this.analytics = new Analytics({
-        writeKey: token
+        writeKey: token,
+        // Segment node library was built for long running node processes like express.
+        // Maintain a lower values for flush than library defaults, so that segment does not
+        // hang CLI node process while waiting for queue to flush.
+        flushAt: 3,
+        flushInterval: 100
       });
     } catch {
       // Ignore errors during initialization - TODO: log to sentry
