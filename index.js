@@ -93,12 +93,14 @@ async function dispatcher() {
 }
 
 const commands = {
-  demo: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.PipEnv
-    ]);
-    createDemo(path.join(gitRoot(), "demo"));
+  demo: async () => {
+    const args = arg({
+      "--source": String
+    });
+
+    const { "--source": source = "master" } = args;
+
+    await createDemo(path.join(gitRoot(), "demo"), source);
     valid("demo app successfully generated");
   },
   parse: () => {
@@ -153,10 +155,7 @@ const commands = {
     removeModules(modules, args["--source"], args["--project"], gitRoot());
   },
   create: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.CookieCutter
-    ]);
+    validateEnvironmentDependencies([EnvironmentDependency.Python]);
 
     const args = arg({
       "--name": String,
@@ -336,7 +335,8 @@ demo`;
           );
         }
 
-        await setModuleDetails(id,
+        await setModuleDetails(
+          id,
           args["--name"],
           args["--description"],
           args["--acceptance-criteria"],
@@ -503,7 +503,11 @@ Glossary:
 };
 
 try {
-  dispatcher();
+  dispatcher().catch((error) => {
+    sentryMonitoring.captureException(error);
+    invalid(error);
+  });
 } catch (err) {
+  sentryMonitoring.captureException(err);
   invalid(err);
 }

@@ -20,6 +20,14 @@ class SentryMonitoring {
       // Do nothing, but prevent any sentry errors from blocking commands from executing
     }
   }
+
+  captureException(error) {
+    try {
+      Sentry.captureException(error);
+    } catch {
+      // Do nothing, but prevent any sentry errors from blocking commands from executing
+    }
+  }
 }
 
 export const sentryMonitoring = new SentryMonitoring();
