@@ -96,7 +96,7 @@ async function dispatcher() {
   const isLoggedIn = isUserLoggedIn();
 
   if (!isLoggedIn && !isLoginNotReqCommand(command)) {
-    console.log("We see you are not logged in. Please log in to run Crowdbotics commands");
+    section("We see you are not logged in. Please log in to run Crowdbotics commands");
     await login();
   }
 
