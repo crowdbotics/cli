@@ -7,6 +7,7 @@ import {
 import fetch from "node-fetch";
 import { formatUrlPath } from "./url.js";
 import { invalid } from "../../utils.js";
+import { logger } from "./logger.js";
 
 class ApiClient {
   get(options) {
@@ -45,6 +46,8 @@ class ApiClient {
       url += "?" + new URLSearchParams(params).toString();
     }
 
+    logger.verbose("API Request", method, url);
+
     const response = await fetch(url, {
       body: body ? JSON.stringify(body) : undefined,
       headers: {
@@ -54,6 +57,14 @@ class ApiClient {
       },
       method: method
     });
+
+    logger.verbose(
+      "API Response",
+      method,
+      url,
+      response.status,
+      response.statusText
+    );
 
     if (shouldFailOnUnauthorized && response.status === 401) {
       // Flush newline before printing error in case console is in loading state.
