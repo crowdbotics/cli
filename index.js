@@ -68,7 +68,6 @@ Visit our official documentation for more information and try again: https://doc
 
 async function dispatcher() {
   const useDefaults = process.env.npm_config_yes;
-  console.log(useDefaults);
 
   // check config if they have been asked opted in or out of amplitude
   const isInitialLogin = configFile.get(HAS_ASKED_OPT_IN_NAME) || false;
