@@ -49,6 +49,7 @@ import { EVENT } from "./scripts/analytics/constants.js";
 import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
+import { logger, prettyPrintShellOutput } from "./scripts/utils/logger.js";
 
 const GLOBAL_ARGS = {
   "--verbose": Boolean
@@ -67,6 +68,7 @@ Visit our official documentation for more information and try again: https://doc
 
 async function dispatcher() {
   const useDefaults = process.env.npm_config_yes;
+  console.log(useDefaults);
 
   // check config if they have been asked opted in or out of amplitude
   const isInitialLogin = configFile.get(HAS_ASKED_OPT_IN_NAME) || false;
@@ -102,6 +104,7 @@ async function dispatcher() {
 const commands = {
   demo: async () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String
     });
 
@@ -212,6 +215,9 @@ const commands = {
       invalid("missing required argument: --name");
     }
     const baseDir = path.join(process.cwd(), args["--name"]);
+
+    logger.verbose("init base dir", baseDir);
+
     const git = spawnSync("git init", [args["--name"]], {
       cwd: process.cwd(),
       shell: true
@@ -232,14 +238,19 @@ demo`;
     fs.mkdirSync(path.join(baseDir, "modules"));
     fs.writeFileSync(path.join(baseDir, ".gitignore"), gitignore, "utf8");
     fs.writeFileSync(path.join(baseDir, "modules", ".keep"), "", "utf8");
-    spawnSync("git add .gitignore modules", [], {
+    const gitAddResult = spawnSync("git add .gitignore modules", [], {
       cwd: baseDir,
       shell: true
     });
-    spawnSync("git commit -m 'Initial commit'", [], {
+
+    logger.verbose("init git add", prettyPrintShellOutput(gitAddResult));
+
+    const gitCommitResult = spawnSync("git commit -m 'Initial commit'", [], {
       cwd: baseDir,
       shell: true
     });
+
+    logger.verbose("init git commit", prettyPrintShellOutput(gitCommitResult));
   },
   upgrade: () => {
     const args = arg({

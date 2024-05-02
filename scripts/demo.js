@@ -4,9 +4,19 @@ import { section } from "../utils.js";
 import fetch from "node-fetch";
 import config from "../config.js";
 import unzipper from "unzipper";
+import { logger } from "./utils/logger.js";
 
 async function downloadAndExtract(url, target) {
+  logger.verbose("demo download request", target, url);
+
   const rnResponse = await fetch(url);
+
+  logger.verbose(
+    "demo download response",
+    rnResponse.status,
+    rnResponse.statusText
+  );
+
   if (rnResponse.ok && rnResponse.body) {
     rnResponse.body.pipe(unzipper.Extract({ path: target }));
   } else {
