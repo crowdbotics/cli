@@ -437,6 +437,7 @@ demo`;
       return;
     }
     configFile.set(OPT_IN_NAME, false);
+    configFile.save();
     valid("Successfully opted out of analytics");
   },
   optin: () => {
@@ -445,6 +446,7 @@ demo`;
       return;
     }
     configFile.set(OPT_IN_NAME, true);
+    configFile.save();
     valid("Successfully opted in of analytics");
   },
   help: () => {
