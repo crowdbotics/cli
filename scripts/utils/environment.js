@@ -1,6 +1,7 @@
 import { execSync, spawnSync } from "node:child_process";
-import { compareVersions, invalid, section, valid, warn } from "../../utils.js";
+import { invalid, section, valid, warn } from "../../utils.js";
 import { configFile } from "./configFile.js";
+import semver from "semver";
 
 const ENVIRONMENT_VERSIONS_CONFIG_NAME = "environment-versions";
 const PYTHON_VERSION_REGEX = /Python (3\.[0-9]*)/;
@@ -224,23 +225,27 @@ export function validateEnvironmentDependencies(
   }
 
   if (dependencies.includes(EnvironmentDependency.CLI)) {
-    if (!environmentVersions.cli) {
+    if (!environmentVersions?.cli || !environmentVersions?.cli?.local) {
       printInvalidMessage("cli is not available in your system");
+      return;
+    }
+
+    if (!environmentVersions?.cli?.registry) {
+      printInvalidMessage("unable to fetch the latest version of the CLI");
+      return;
+    }
+
+    const cliVersionMessage = `CLI Version current: ${environmentVersions?.cli?.local?.version} latest: ${environmentVersions?.cli?.registry?.latest}`;
+    const updateVersionMessage = "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
+    const compare = semver.compare(
+      environmentVersions?.cli?.local?.version,
+      environmentVersions?.cli?.registry?.latest
+    );
+    if (compare < 0) {
+      warn(cliVersionMessage);
+      warn(updateVersionMessage);
     } else {
-      if (environmentVersions?.cli?.registry) {
-        const cliVersionMessage = `CLI Version current: ${environmentVersions?.cli?.local?.version} latest: ${environmentVersions?.cli?.registry?.latest}`;
-        const updateVersionMessage = "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
-        const compare = compareVersions(
-          environmentVersions?.cli?.local?.version,
-          environmentVersions?.cli?.registry?.latest
-        );
-        if (compare < 0) {
-          warn(cliVersionMessage);
-          warn(updateVersionMessage);
-        } else {
-          valid(cliVersionMessage);
-        }
-      }
+      valid(cliVersionMessage);
     }
   }
 }
