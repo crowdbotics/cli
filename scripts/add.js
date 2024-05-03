@@ -3,6 +3,7 @@ import fse from "fs-extra";
 import path from "path";
 import find from "find";
 import { execSync } from "child_process";
+import { logger } from "./utils/logger.js";
 
 const IGNORED_ENTRIES = ["meta.json", "node_modules"];
 
@@ -25,12 +26,15 @@ const getPkgJsonDeps = (pkgJson) => {
 };
 
 function installPipPackage(file, moduleDir, appDir, metaRoot) {
+  logger.verbose("installing pip package", file, moduleDir);
+
   const packagePath = path
     .join(metaRoot, path.dirname(file).replace(moduleDir, ""))
     .replace(/^\/backend/, "");
 
   process.chdir(path.join(appDir, "backend"));
   const command = `pipenv install -e ./${packagePath}`;
+
   try {
     execSync(command);
   } catch (err) {
@@ -39,6 +43,8 @@ function installPipPackage(file, moduleDir, appDir, metaRoot) {
 }
 
 function installNpmPackage(file, moduleDir, appDir, metaRoot) {
+  logger.verbose("installing npm package", file, moduleDir);
+
   const pkgJson = JSON.parse(fs.readFileSync(file, "utf8"));
   const yarnPath = path.join(
     "file:.",
@@ -47,8 +53,11 @@ function installNpmPackage(file, moduleDir, appDir, metaRoot) {
   );
   const packages = [yarnPath, ...getPkgJsonDeps(pkgJson)].join(" ");
 
+  logger.verbose("installing npm packages", packages, yarnPath);
+
   process.chdir(appDir);
   const command = `yarn add ${packages}`;
+
   try {
     execSync(command);
   } catch (err) {
@@ -71,12 +80,20 @@ export function addModules(modules, source, dir, gitRoot) {
     dir = path.join(gitRoot, "demo");
   }
 
+  logger.verbose("add source", source, "dir", dir);
+
   modules.forEach((module) => {
     process.chdir(gitRoot);
     const originModuleDir = path.join(source, module);
+
+    logger.verbose("add module", module, originModuleDir);
+
     const meta = JSON.parse(
       fs.readFileSync(path.join(originModuleDir, "meta.json"), "utf8")
     );
+
+    logger.verbose("add module meta", meta);
+
     const targetModuleDir = path.join(dir, meta.root);
 
     // cleanup node_modules
