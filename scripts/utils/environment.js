@@ -2,6 +2,7 @@ import { execSync, spawnSync } from "node:child_process";
 import { invalid, section, valid, warn } from "../../utils.js";
 import { configFile } from "./configFile.js";
 import semver from "semver";
+import { logger } from "./logger.js";
 
 const ENVIRONMENT_VERSIONS_CONFIG_NAME = "environment-versions";
 const PYTHON_VERSION_REGEX = /Python (3\.[0-9]*)/;
@@ -41,6 +42,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("Yarn dependency check", yarn);
+
     if (!yarn.error && !yarn.stderr) {
       environmentVersions.yarn = formatStdout(yarn.stdout);
     }
@@ -53,6 +56,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("Git dependency check", git);
+
     if (!git.error && !git.stderr) {
       environmentVersions.git = formatStdout(git.stdout);
     }
@@ -64,6 +69,8 @@ export function getEnvironmentVersions(dependencies) {
       shell: true,
       encoding: "utf8"
     });
+
+    logger.verbose("Python dependency check", python);
 
     if (python.stdout && !python.error && !python.stderr) {
       const versionMatch = python.stdout.match(PYTHON_VERSION_REGEX);
@@ -81,6 +88,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("pipenv dependency check", pipenv);
+
     if (!pipenv.stderr && !pipenv.error) {
       environmentVersions.pipenv = formatStdout(pipenv.stdout);
     }
@@ -92,6 +101,8 @@ export function getEnvironmentVersions(dependencies) {
       shell: true,
       encoding: "utf8"
     });
+
+    logger.verbose("Cookiecutter dependency check", cookiecutter);
 
     if (!cookiecutter.stderr && !cookiecutter.error) {
       environmentVersions.cookiecutter = cookiecutter.stdout.trim();
@@ -154,6 +165,8 @@ export function validateEnvironmentDependencies(
   if (showTitle) {
     section("Checking environment compatibility");
   }
+
+  logger.verbose("Validating environment dependencies", dependencies);
 
   const configValues = configFile.get(ENVIRONMENT_VERSIONS_CONFIG_NAME);
 
