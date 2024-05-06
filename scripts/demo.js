@@ -3,7 +3,7 @@ import fs from "fs";
 import { section } from "../utils.js";
 import fetch from "node-fetch";
 import config from "../config.js";
-import unzipper from "unzipper";
+import unzip from "unzip-stream";
 import { logger } from "./utils/logger.js";
 
 async function downloadAndExtract(url, target) {
@@ -18,7 +18,7 @@ async function downloadAndExtract(url, target) {
   );
 
   if (rnResponse.ok && rnResponse.body) {
-    rnResponse.body.pipe(unzipper.Extract({ path: target }));
+    rnResponse.body.pipe(unzip.Extract({ path: target }));
   } else {
     throw new Error("Failed to download scaffold for demo app.");
   }
