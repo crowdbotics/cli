@@ -194,7 +194,7 @@ export function validateEnvironmentDependencies(
 
   const printInvalidMessage = (message) =>
     invalid(
-      `${message}\n\nVisit the following page for environment requirements https://github.com/crowdbotics/modules?tab=readme-ov-file#requirements-for-contributing`
+      `${message}\n\nVisit the following page for environment requirements https://docs.crowdbotics.com/v1/docs/set-up-your-dev-env`
     );
 
   if (dependencies.includes(EnvironmentDependency.Yarn)) {
