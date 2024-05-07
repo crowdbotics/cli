@@ -101,3 +101,7 @@ export const performLogout = async () => {
     return false;
   }
 };
+
+export const isUserLoggedIn = () => {
+  return !!configFile.get(TOKEN_CONFIG_NAME);
+};

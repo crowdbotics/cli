@@ -6,7 +6,3 @@ export const configureInitialLogin = async () => {
   configFile.set(HAS_ASKED_OPT_IN_NAME, true);
   configFile.save();
 };
-
-// when log in we will always have
-// check OPT_IN_NAME instances
-// make command for opting in again
