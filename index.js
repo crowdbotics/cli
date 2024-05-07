@@ -41,25 +41,20 @@ import {
   EnvironmentDependency
 } from "./scripts/utils/environment.js";
 import { analytics } from "./scripts/analytics/wrapper.js";
-import { HAS_ASKED_OPT_IN_NAME, OPT_IN_NAME } from "./scripts/analytics/config.js";
+import {
+  HAS_ASKED_OPT_IN_NAME,
+  OPT_IN_NAME
+} from "./scripts/analytics/config.js";
 import { EVENT } from "./scripts/analytics/constants.js";
 import { configureInitialLogin } from "./scripts/analytics/scripts.js";
 import { sentryMonitoring } from "./scripts/utils/sentry.js";
 import { setModuleDetails } from "./scripts/setModuleDetails.js";
 import { isUserLoggedIn } from "./scripts/utils/auth.js";
+import { logger, prettyPrintShellOutput } from "./scripts/utils/logger.js";
 
-const pkg = JSON.parse(
-  fs.readFileSync(new URL("package.json", import.meta.url), "utf8")
-);
-
-let sourceDir = path.dirname(path.dirname(process.argv[1]));
-if (fs.existsSync(path.join(sourceDir, pkg.name))) {
-  // npx lib directory
-  sourceDir = path.join(sourceDir, pkg.name);
-} else {
-  // npm lib directory
-  sourceDir = path.join(sourceDir, "lib", "node_modules", pkg.name);
-}
+const GLOBAL_ARGS = {
+  "--verbose": Boolean
+};
 
 const gitRoot = () => {
   try {
@@ -80,6 +75,13 @@ async function dispatcher() {
   if (!isInitialLogin && isUserEnvironment && !useDefaults) {
     await configureInitialLogin();
   }
+
+  // Compulsory dependencies check on each command
+  // Note: This is a forced check, so no cache is used
+  // consider performance implications when adding new dependencies
+  validateEnvironmentDependencies([
+    EnvironmentDependency.CLI
+  ], true, false);
 
   const command = process.argv[2];
 
@@ -114,19 +116,20 @@ async function dispatcher() {
 }
 
 const commands = {
-  demo: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.PipEnv
-    ]);
-    createDemo(
-      path.join(gitRoot(), "demo"),
-      path.join(sourceDir, "cookiecutter.yaml")
-    );
+  demo: async () => {
+    const args = arg({
+      ...GLOBAL_ARGS,
+      "--source": String
+    });
+
+    const { "--source": source = "master" } = args;
+
+    await createDemo(path.join(gitRoot(), "demo"), source);
     valid("demo app successfully generated");
   },
   parse: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--write": String
     });
@@ -154,6 +157,7 @@ const commands = {
     ]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--project": String
     });
@@ -167,6 +171,7 @@ const commands = {
     validateEnvironmentDependencies([EnvironmentDependency.Yarn]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String,
       "--project": String
     });
@@ -177,12 +182,10 @@ const commands = {
     removeModules(modules, args["--source"], args["--project"], gitRoot());
   },
   create: () => {
-    validateEnvironmentDependencies([
-      EnvironmentDependency.Python,
-      EnvironmentDependency.CookieCutter
-    ]);
+    validateEnvironmentDependencies([EnvironmentDependency.Python]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--name": String,
       "--type": String,
       "--target": String,
@@ -206,6 +209,7 @@ const commands = {
   },
   commit: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--source": String
     });
     const modules = args._.slice(1);
@@ -218,12 +222,16 @@ const commands = {
     validateEnvironmentDependencies([EnvironmentDependency.Git]);
 
     const args = arg({
+      ...GLOBAL_ARGS,
       "--name": String
     });
     if (!args["--name"]) {
       invalid("missing required argument: --name");
     }
     const baseDir = path.join(process.cwd(), args["--name"]);
+
+    logger.verbose("init base dir", baseDir);
+
     const git = spawnSync("git init", [args["--name"]], {
       cwd: process.cwd(),
       shell: true
@@ -244,17 +252,23 @@ demo`;
     fs.mkdirSync(path.join(baseDir, "modules"));
     fs.writeFileSync(path.join(baseDir, ".gitignore"), gitignore, "utf8");
     fs.writeFileSync(path.join(baseDir, "modules", ".keep"), "", "utf8");
-    spawnSync("git add .gitignore modules", [], {
+    const gitAddResult = spawnSync("git add .gitignore modules", [], {
       cwd: baseDir,
       shell: true
     });
-    spawnSync("git commit -m 'Initial commit'", [], {
+
+    logger.verbose("init git add", prettyPrintShellOutput(gitAddResult));
+
+    const gitCommitResult = spawnSync("git commit -m 'Initial commit'", [], {
       cwd: baseDir,
       shell: true
     });
+
+    logger.verbose("init git commit", prettyPrintShellOutput(gitCommitResult));
   },
   upgrade: () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--version": String
     });
     analytics.sendEvent({ name: EVENT.UPGRADE });
@@ -270,7 +284,9 @@ demo`;
     info();
   },
   config: () => {
-    const args = arg({});
+    const args = arg({
+      ...GLOBAL_ARGS
+    });
 
     const action = args._[1];
     const key = args._[2];
@@ -308,6 +324,7 @@ demo`;
 
   modules: async () => {
     const args = arg({
+      ...GLOBAL_ARGS,
       "--search": String,
       "--visibility": String,
       "--status": String,
@@ -360,7 +377,8 @@ demo`;
           );
         }
 
-        await setModuleDetails(id,
+        await setModuleDetails(
+          id,
           args["--name"],
           args["--description"],
           args["--acceptance-criteria"],
@@ -406,7 +424,9 @@ demo`;
   },
 
   feedback: () => {
-    const args = arg({});
+    const args = arg({
+      ...GLOBAL_ARGS
+    });
     const action = args._[1];
 
     if (!action) {
@@ -529,7 +549,11 @@ Glossary:
 };
 
 try {
-  dispatcher();
+  dispatcher().catch((error) => {
+    sentryMonitoring.captureException(error);
+    invalid(error);
+  });
 } catch (err) {
+  sentryMonitoring.captureException(err);
   invalid(err);
 }

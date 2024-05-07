@@ -11,8 +11,11 @@ import {
 } from "./utils/templates.js";
 import { execOptions, configurePython } from "./utils/environment.js";
 import inquirer from "inquirer";
+import { logger } from "./utils/logger.js";
 
 function generateRNFiles(base, name, relative = "/") {
+  logger.verbose("generating rn files", base, name, relative);
+
   if (relative !== "/") {
     fs.mkdirSync(path.join(base, relative), {
       recursive: true
@@ -35,6 +38,13 @@ function generateDjangoFiles(base, name, relative = "/") {
   const djangoName = `django_${sanitizedName}`;
   const basePath = path.join(base, relative, djangoName);
   const innerAppPath = path.join(basePath, sanitizedName);
+
+  logger.verbose(
+    "generating django files",
+    sanitizedName,
+    djangoName,
+    innerAppPath
+  );
 
   fs.mkdirSync(innerAppPath, { recursive: true });
   execSync(`cd ${innerAppPath}`, execOptions);
@@ -168,6 +178,8 @@ export async function createModule(
     target = path.join(gitRoot, "modules");
   }
 
+  logger.verbose("create module", name, type, target);
+
   const slugMap = {
     all: name,
     "react-native": `react-native-${name}`,
@@ -183,6 +195,8 @@ export async function createModule(
   if (existsSync(dir)) invalid(`module named "${slug}" already exists`);
 
   const meta = generateMeta(name, type, searchDescription, acceptanceCriteria);
+
+  logger.verbose("create module meta", meta);
 
   try {
     fs.mkdirSync(dir, { recursive: true });

@@ -4,6 +4,7 @@ import crypto from "crypto";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { valid, invalid, section } from "../utils.js";
+import { logger } from "./utils/logger.js";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -76,12 +77,17 @@ export const parseModules = (dir, gitRoot) => {
   };
 
   const data = {};
+
+  logger.verbose("parse modules dir", dir);
+
   const modules = fs.readdirSync(dir);
   section("Parsing modules...", "\n");
 
   modules.forEach((module) => {
     const modulePath = path.join(dir, module);
     data[module] = moduleDefaults(module);
+
+    logger.verbose("parse module ", module, modulePath);
 
     // cleanup node_modules
     if (existsSync(path.join(modulePath, "node_modules"))) {
@@ -96,6 +102,8 @@ export const parseModules = (dir, gitRoot) => {
     parseModule(modulePath, (filePath, content) => {
       data[module].files[filePath] = content;
     });
+
+    logger.verbose("parse module details start", module, data[module]);
 
     // Parse module metadata
     const meta = JSON.parse(data[module].files[META_FILE]);
@@ -159,6 +167,8 @@ export const parseModules = (dir, gitRoot) => {
     }
 
     data[module].meta.preview = preview;
+
+    logger.verbose("parse module details end", module, data[module]);
 
     valid(module);
   });

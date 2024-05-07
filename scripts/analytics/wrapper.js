@@ -2,6 +2,7 @@ import { configFile } from "../utils/configFile.js";
 import { SEGMENT_API_KEY, OPT_IN_NAME } from "./config.js";
 import { currentUser } from "../utils/user.js";
 import { Analytics } from "@segment/analytics-node";
+import { logger } from "../utils/logger.js";
 
 class AnalyticsWrapper {
   constructor() {
@@ -36,7 +37,12 @@ class AnalyticsWrapper {
 
     try {
       this.analytics = new Analytics({
-        writeKey: token
+        writeKey: token,
+        // Segment node library was built for long running node processes like express.
+        // Maintain a lower values for flush than library defaults, so that segment does not
+        // hang CLI node process while waiting for queue to flush.
+        flushAt: 3,
+        flushInterval: 100
       });
     } catch {
       // Ignore errors during initialization - TODO: log to sentry
@@ -60,7 +66,11 @@ class AnalyticsWrapper {
   async sendEvent(event) {
     this.event = event;
     const { name, properties = {}, user } = this.event;
-    if (!this.optedIn) return;
+
+    if (!this.optedIn) {
+      logger.verbose("user not opted in to analytics, skipping event", event);
+      return;
+    }
 
     try {
       this.init();

@@ -1,51 +1,39 @@
 import path from "path";
 import fs from "fs";
-import fse from "fs-extra";
-import { section, generateCommand } from "../utils.js";
-import { execSync } from "child_process";
-import { configurePython, execOptions } from "./utils/environment.js";
+import { section } from "../utils.js";
+import fetch from "node-fetch";
+import config from "../config.js";
+import unzipper from "unzipper";
+import { logger } from "./utils/logger.js";
 
-export function createDemo(dir, yaml) {
-  const options = Object.assign(execOptions, {
-    cwd: path.dirname(dir)
-  });
+async function downloadAndExtract(url, target) {
+  logger.verbose("demo download request", target, url);
+
+  const rnResponse = await fetch(url);
+
+  logger.verbose(
+    "demo download response",
+    rnResponse.status,
+    rnResponse.statusText
+  );
+
+  if (rnResponse.ok && rnResponse.body) {
+    rnResponse.body.pipe(unzipper.Extract({ path: target }));
+  } else {
+    throw new Error("Failed to download scaffold for demo app.");
+  }
+}
+
+export async function createDemo(dir, target = "master") {
+  const rnDemoUrl = `${config.constants.REACT_NATIVE_SCAFFOLD_REPO_ORIGIN}/raw/${target}/dist/react-native-demo.zip`;
+  const djangoDemoUrl = `${config.constants.DJANGO_SCAFFOLD_REPO_ORIGIN}/raw/${target}/dist/django-demo.zip`;
 
   if (fs.existsSync(dir)) {
     section("Removing previous demo app");
     fs.rmSync(dir, { recursive: true });
   }
 
-  section("Preparing environment");
-  configurePython();
-  execSync("pipenv install cookiecutter", options);
-
-  section("Generating React Native app from scaffold");
-  const rnCookieCutterCommand = generateCommand([
-    "pipenv run cookiecutter",
-    "gh:crowdbotics/react-native-scaffold",
-    "--directory dist/cookie",
-    "--checkout master",
-    `--config-file ${yaml}`,
-    "--no-input"
-  ]);
-  execSync(rnCookieCutterCommand, options);
-
-  section("Installing dependencies");
-  execSync("yarn install", {
-    cwd: dir,
-    encoding: "utf8",
-    stdio: "inherit"
-  });
-
-  section("Generating Django app from scaffold");
-  const djangoCookieCutterCommand = generateCommand([
-    "pipenv run cookiecutter",
-    "gh:crowdbotics/django-scaffold",
-    "--checkout master",
-    `--config-file ${yaml}`,
-    `--output-dir ${path.basename(dir)}`,
-    "--no-input"
-  ]);
-  execSync(djangoCookieCutterCommand, options);
-  fse.moveSync(path.join(dir, path.basename(dir)), path.join(dir, "backend"));
+  fs.mkdirSync(dir, { recursive: true });
+  await downloadAndExtract(rnDemoUrl, dir);
+  await downloadAndExtract(djangoDemoUrl, path.join(dir, "backend"));
 }
