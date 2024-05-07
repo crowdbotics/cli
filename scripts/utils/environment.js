@@ -140,7 +140,7 @@ export function getEnvironmentVersions(dependencies) {
       environmentVersions.cli = {
         ...environmentVersions.cli,
         local: {
-          version: localCLI[1] || "Not installed"
+          version: localCLI?.[1] || "0.0.0"
         }
       };
     }
