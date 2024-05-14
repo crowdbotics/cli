@@ -5,8 +5,8 @@ import {
   PRODUCTION_SEGMENT_KEY
 } from "./constants.js";
 
-export const HAS_ASKED_OPT_IN_NAME = "has-asked-opt-in";
-export const OPT_IN_NAME = "opt-in";
+export const HAS_ASKED_OPT_IN_NAME = "has-asked-opt-in-default";
+export const OPT_IN_NAME = "opted-in-default";
 
 export const SEGMENT_API_KEY =
   configFile.get(HOST_CONFIG_NAME) === DEFAULT_HOST

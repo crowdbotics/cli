@@ -14,7 +14,8 @@ export default {
     CROWDBOTICS_FILE: ".crowdbotics.json",
     COOKIECUTTER_PACKAGE: "cookiecutter==1.7.3",
     REACT_NATIVE_SCAFFOLD_REPO_ORIGIN:
-      "https://github.com/crowdbotics/react-native-scaffold"
+      "https://github.com/crowdbotics/react-native-scaffold",
+    DJANGO_SCAFFOLD_REPO_ORIGIN: "https://github.com/crowdbotics/django-scaffold"
   },
   scaffold: {
     directory: SCAFFOLD_DIRECTORY

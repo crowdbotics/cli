@@ -1,6 +1,8 @@
 import { execSync, spawnSync } from "node:child_process";
-import { invalid, section, valid } from "../../utils.js";
+import { invalid, section, valid, warn } from "../../utils.js";
 import { configFile } from "./configFile.js";
+import semver from "semver";
+import { logger } from "./logger.js";
 
 const ENVIRONMENT_VERSIONS_CONFIG_NAME = "environment-versions";
 const PYTHON_VERSION_REGEX = /Python (3\.[0-9]*)/;
@@ -14,7 +16,8 @@ export const EnvironmentDependency = {
   Git: "git",
   Python: "python",
   PipEnv: "pipenv",
-  CookieCutter: "cookiecutter"
+  CookieCutter: "cookiecutter",
+  CLI: "cli"
 };
 
 /**
@@ -39,6 +42,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("Yarn dependency check", yarn);
+
     if (!yarn.error && !yarn.stderr) {
       environmentVersions.yarn = formatStdout(yarn.stdout);
     }
@@ -51,6 +56,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("Git dependency check", git);
+
     if (!git.error && !git.stderr) {
       environmentVersions.git = formatStdout(git.stdout);
     }
@@ -62,6 +69,8 @@ export function getEnvironmentVersions(dependencies) {
       shell: true,
       encoding: "utf8"
     });
+
+    logger.verbose("Python dependency check", python);
 
     if (python.stdout && !python.error && !python.stderr) {
       const versionMatch = python.stdout.match(PYTHON_VERSION_REGEX);
@@ -79,6 +88,8 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("pipenv dependency check", pipenv);
+
     if (!pipenv.stderr && !pipenv.error) {
       environmentVersions.pipenv = formatStdout(pipenv.stdout);
     }
@@ -91,8 +102,47 @@ export function getEnvironmentVersions(dependencies) {
       encoding: "utf8"
     });
 
+    logger.verbose("Cookiecutter dependency check", cookiecutter);
+
     if (!cookiecutter.stderr && !cookiecutter.error) {
-      environmentVersions.cookiecutter = cookiecutter.stdout;
+      environmentVersions.cookiecutter = cookiecutter.stdout.trim();
+    }
+  }
+
+  if (EnvironmentDependency.CLI) {
+    const registryResult = spawnSync("npm view crowdbotics --json", {
+      cwd: userdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: 2000 // 2 second to keep the CLI working without internet
+    });
+
+    const localCLIResult = spawnSync("npm list -g crowdbotics --depth=0", {
+      cwd: userdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: 2000
+    });
+
+    if (!registryResult.stderr && !registryResult.error) {
+      const result = JSON.parse(registryResult.stdout);
+      environmentVersions.cli = {
+        registry: {
+          version: result?.version,
+          latest: result?.["dist-tags"]?.latest,
+          lastChecked: new Date().toISOString()
+        }
+      };
+    }
+
+    if (!localCLIResult.stderr && !localCLIResult.error) {
+      const localCLI = localCLIResult.stdout.match(/crowdbotics@([0-9.]+)/);
+      environmentVersions.cli = {
+        ...environmentVersions.cli,
+        local: {
+          version: localCLI?.[1] || "0.0.0"
+        }
+      };
     }
   }
 
@@ -105,11 +155,18 @@ export function validateEnvironmentDependencies(
     EnvironmentDependency.Git,
     EnvironmentDependency.Python,
     EnvironmentDependency.PipEnv,
-    EnvironmentDependency.CookieCutter
+    EnvironmentDependency.CookieCutter,
+    EnvironmentDependency.CLI
   ],
-  force = false
+  force = false,
+  showTitle = true
 ) {
-  section("Checking environment compatibility");
+  // We don't always want to show the title for future silent validations
+  if (showTitle) {
+    section("Checking environment compatibility");
+  }
+
+  logger.verbose("Validating environment dependencies", dependencies);
 
   const configValues = configFile.get(ENVIRONMENT_VERSIONS_CONFIG_NAME);
 
@@ -137,7 +194,7 @@ export function validateEnvironmentDependencies(
 
   const printInvalidMessage = (message) =>
     invalid(
-      `${message}\n\nVisit the following page for environment requirements https://github.com/crowdbotics/modules?tab=readme-ov-file#requirements-for-contributing`
+      `${message}\n\nVisit the following page for environment requirements https://docs.crowdbotics.com/v1/docs/set-up-your-dev-env`
     );
 
   if (dependencies.includes(EnvironmentDependency.Yarn)) {
@@ -177,6 +234,31 @@ export function validateEnvironmentDependencies(
       printInvalidMessage("cookiecutter is not available in your system");
     } else {
       valid(environmentVersions.cookiecutter);
+    }
+  }
+
+  if (dependencies.includes(EnvironmentDependency.CLI)) {
+    if (!environmentVersions?.cli || !environmentVersions?.cli?.local) {
+      printInvalidMessage("cli is not available in your system");
+      return;
+    }
+
+    if (!environmentVersions?.cli?.registry) {
+      printInvalidMessage("unable to fetch the latest version of the CLI");
+      return;
+    }
+
+    const cliVersionMessage = `CLI Version current: ${environmentVersions?.cli?.local?.version} latest: ${environmentVersions?.cli?.registry?.latest}`;
+    const updateVersionMessage = "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
+    const compare = semver.compare(
+      environmentVersions?.cli?.local?.version,
+      environmentVersions?.cli?.registry?.latest
+    );
+    if (compare < 0) {
+      warn(cliVersionMessage);
+      warn(updateVersionMessage);
+    } else {
+      valid(cliVersionMessage);
     }
   }
 }

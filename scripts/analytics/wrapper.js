@@ -2,6 +2,7 @@ import { configFile } from "../utils/configFile.js";
 import { SEGMENT_API_KEY, OPT_IN_NAME } from "./config.js";
 import { currentUser } from "../utils/user.js";
 import { Analytics } from "@segment/analytics-node";
+import { logger } from "../utils/logger.js";
 
 class AnalyticsWrapper {
   constructor() {
@@ -65,7 +66,11 @@ class AnalyticsWrapper {
   async sendEvent(event) {
     this.event = event;
     const { name, properties = {}, user } = this.event;
-    if (!this.optedIn) return;
+
+    if (!this.optedIn) {
+      logger.verbose("user not opted in to analytics, skipping event", event);
+      return;
+    }
 
     try {
       this.init();
