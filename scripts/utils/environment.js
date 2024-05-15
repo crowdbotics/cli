@@ -95,7 +95,7 @@ export function getEnvironmentVersions(dependencies) {
     }
   }
 
-  if (EnvironmentDependency.CookieCutter) {
+  if (dependencies.includes(EnvironmentDependency.CookieCutter)) {
     const cookiecutter = spawnSync("cookiecutter --version", {
       cwd: userdir,
       shell: true,
@@ -109,7 +109,7 @@ export function getEnvironmentVersions(dependencies) {
     }
   }
 
-  if (EnvironmentDependency.CLI) {
+  if (dependencies.includes(EnvironmentDependency.CLI)) {
     const registryResult = spawnSync("npm view crowdbotics --json", {
       cwd: userdir,
       shell: true,
@@ -183,11 +183,17 @@ export function validateEnvironmentDependencies(
   const currentEnvironmentVersions = getEnvironmentVersions(
     missingEnvironmentVersions
   );
+  logger.verbose("current environment versions", currentEnvironmentVersions);
 
   const environmentVersions = {
     ...cachedEnvironmentVersions,
     ...currentEnvironmentVersions
   };
+
+  logger.verbose(
+    "all environment versions (including cache)",
+    currentEnvironmentVersions
+  );
 
   configFile.set(ENVIRONMENT_VERSIONS_CONFIG_NAME, environmentVersions);
   configFile.save();
@@ -239,17 +245,18 @@ export function validateEnvironmentDependencies(
 
   if (dependencies.includes(EnvironmentDependency.CLI)) {
     if (!environmentVersions?.cli || !environmentVersions?.cli?.local) {
-      printInvalidMessage("cli is not available in your system");
+      logger.verbose("cli is not available in your system");
       return;
     }
 
     if (!environmentVersions?.cli?.registry) {
-      printInvalidMessage("unable to fetch the latest version of the CLI");
+      logger.verbose("unable to fetch the latest version of the CLI");
       return;
     }
 
     const cliVersionMessage = `CLI Version current: ${environmentVersions?.cli?.local?.version} latest: ${environmentVersions?.cli?.registry?.latest}`;
-    const updateVersionMessage = "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
+    const updateVersionMessage =
+      "You have an older version. Please update to new version by following this command: npm install -g crowdbotics";
     const compare = semver.compare(
       environmentVersions?.cli?.local?.version,
       environmentVersions?.cli?.registry?.latest
