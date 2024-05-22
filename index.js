@@ -28,7 +28,13 @@ import { info } from "./scripts/info.js";
 import { removeModules } from "./scripts/remove.js";
 import { commitModules } from "./scripts/commit-module.js";
 import { upgradeScaffold } from "./scripts/upgrade.js";
-import { valid, invalid, section, isUserEnvironment, isLoginNotReqCommand } from "./utils.js";
+import {
+  valid,
+  invalid,
+  section,
+  isUserEnvironment,
+  isLoginNotReqCommand
+} from "./utils.js";
 import { createModule } from "./scripts/create.js";
 import { login } from "./scripts/login.js";
 import { configFile } from "./scripts/utils/configFile.js";
@@ -53,7 +59,8 @@ import { isUserLoggedIn } from "./scripts/utils/auth.js";
 import { logger, prettyPrintShellOutput } from "./scripts/utils/logger.js";
 
 const GLOBAL_ARGS = {
-  "--verbose": Boolean
+  "--verbose": Boolean,
+  "--skip-login-check": Boolean
 };
 
 const gitRoot = () => {
@@ -79,9 +86,7 @@ async function dispatcher() {
   // Compulsory dependencies check on each command
   // Note: This is a forced check, so no cache is used
   // consider performance implications when adding new dependencies
-  validateEnvironmentDependencies([
-    EnvironmentDependency.CLI
-  ], true, false);
+  validateEnvironmentDependencies([EnvironmentDependency.CLI], true, false);
 
   const command = process.argv[2];
 
@@ -96,9 +101,12 @@ async function dispatcher() {
   sentryMonitoring.registerCommandName(command);
 
   const isLoggedIn = isUserLoggedIn();
+  const skipLoginCheck = process.argv.includes("--skip-login-check");
 
-  if (!isLoggedIn && !isLoginNotReqCommand(command)) {
-    section("We see you are not logged in. Please log in to run Crowdbotics commands");
+  if (!skipLoginCheck && !isLoggedIn && !isLoginNotReqCommand(command)) {
+    section(
+      "We see you are not logged in. Please log in to run Crowdbotics commands"
+    );
     await login();
   }
 
