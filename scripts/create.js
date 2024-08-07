@@ -106,7 +106,7 @@ const getValidModuleInputs = async (
       message: "Module Type:",
       name: "inputType",
       type: "list",
-      choices: ["all", "react-native", "django"]
+      choices: ["all", "react-native", "django", "custom"]
     });
 
     type = inputType;
@@ -182,6 +182,7 @@ export async function createModule(
 
   const slugMap = {
     all: name,
+    custom: name,
     "react-native": `react-native-${name}`,
     django: `django-${name}`
   };
@@ -217,6 +218,9 @@ export async function createModule(
         break;
       case "django":
         generateDjangoFiles(dir, name);
+        break;
+      case "custom":
+        // Do nothing - no files to write.
         break;
     }
   } catch (error) {
