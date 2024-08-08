@@ -488,7 +488,6 @@ Commands available:
   get      Get information about a module by id
   set      Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>".
   create   Create a new module of a given type
-  create   Create a new module of a given type
   commit   Update an existing module from the demo source code
   init     Initialize a blank modules repository
   upgrade  Upgrade your existing app's scaffold to the latest version
@@ -511,7 +510,7 @@ Create a demo app:
   cb demo
 
 Create a module of a given type:
-  cb create --name <module-name> --type <all/react-native/django>
+  cb create --name <module-name> --type <all/react-native/django/custom>
 
 Initialize a modules repository:
   cb init --name <my-modules-repository-name>

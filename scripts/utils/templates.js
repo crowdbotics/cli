@@ -76,6 +76,7 @@ export function generateMeta(
 ) {
   const rootMap = {
     all: "/",
+    custom: "/",
     "react-native": `/modules/${name}`,
     django: "/backend/modules"
   };
