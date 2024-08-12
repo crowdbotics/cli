@@ -409,13 +409,13 @@ demo`;
       case "help":
         section(
           `Commands available:
-  list          List the current modules available to install
-                --search <query> Search for a module by given text
-                --status <published | archived> Search for a module by either published or archived modules (default all)
-                --visibility <private | public> Search for a module with a specific visibility (default all)
-  get     <id>  Get the details for the specified module
-  archive <id> Archive the specified module to prevent future installation to a project
-                --unarchive Undo the archive of the module to set the status back to Published
+            list    List the current modules available to install
+                    --search <query> Search for a module by given text
+                    --status <published | archived> Search for a module by either published or archived modules (default all)
+                    --visibility <private | public> Search for a module with a specific visibility (default all)
+            get     <id>  Get the details for the specified module
+            archive <id> Archive the specified module to prevent future installation to a project
+                    --unarchive Undo the archive of the module to set the status back to Published
           `
         );
         break;
@@ -481,30 +481,27 @@ demo`;
     console.log(`usage: cb <command>
 
 Commands available:
-  parse    Parse and validate your modules
-  demo     Generate a local React Native and Django demo app
-  add      Install a module in the demo app
-  remove   Remove a module from the demo app
-  get      Get information about a module by id
-  set      Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>".
-  create   Create a new module of a given type
-  commit   Update an existing module from the demo source code
-  init     Initialize a blank modules repository
-  upgrade  Upgrade your existing app's scaffold to the latest version
-  help     Show this help page
-  feedback Send feedback to Crowdbotics to let us know how we're doing
-  login    Login to your Crowdbotics account. Requires 2FA authentication
-  logout   Logout of your Crowdbotics account
-  publish  Publish your modules to your organization's private catalog
-  modules  Manage modules for your organization
-  optin    Opt in for Crowdbotics analytics
-  optout   Opt out for Crowdbotics analytics
+  add               Install a module in the demo app
+  commit            Update an existing module from the demo source code
+  create            Create a new module of a given type
+  demo              Generate a local React Native and Django demo app
+  feedback          Send feedback to Crowdbotics to let us know how we're doing
+  help              Show this help page
+  init              Initialize a blank modules repository
+  login             Login to your Crowdbotics account. May require 2FA (two-factor authentication).
+  logout            Logout of your Crowdbotics account
+  modules           Manage modules for your organization
+  modules archive   Sets module into archived state
+  modules get       Get information about a module by id
+  modules list      Lists modules available
+  modules set       Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>"
+  optin             Opt in for Crowdbotics analytics
+  optout            Opt out for Crowdbotics analytics
+  parse             Parse and validate your modules
+  publish           Publish your modules to your organization's private catalog
+  remove            Remove a module from the demo app
+  upgrade           Upgrade your existing app's scaffold to the latest version
 
-Parse and validate your modules:
-  cb parse --source <path>
-
-Parse modules and write the data to a json file:
-  cb parse --source <path> --write <path>
 
 Create a demo app:
   cb demo
@@ -512,26 +509,15 @@ Create a demo app:
 Create a module of a given type:
   cb create --name <module-name> --type <all/react-native/django/custom>
 
+Get information about a module by id:
+  cb modules get <module-id>
+
 Initialize a modules repository:
   cb init --name <my-modules-repository-name>
-
-Upgrade your scaffold to the latest master:
-  cb upgrade
-
-Upgrade your scaffold to a specific version (git tag, git commit or branch name):
-  cb upgrade --version 2.3.0
 
 Install one or modules to your demo app:
   cb add <module-name> <module-name-2>
 
-Remove one or modules from your demo app:
-  cb remove <module-name> <module-name-2>
-
-Get information about a module by id:
-  cb modules get <module-id>
-
-Set information about a module by id such as name, description, acceptance criteria, and search description:
-  cb modules set <module-id> --name "<name>" --description "<description>" --acceptance-criteria "<acceptance-criteria>" --search-description "<search-description>"
   The new values must be wrapped in quotes "<value>".
 
 Install modules from other directory:
@@ -540,14 +526,32 @@ Install modules from other directory:
 Install modules to other app that is not "demo":
   cb add --project ../other-project <module-name>
 
+Parse and validate your modules:
+  cb parse --source <path>
+
+Parse modules and write the data to a json file:
+  cb parse --source <path> --write <path>
+
 Remove modules from app that is not "demo":
   cb remove --project ../other-project <module-name>
+
+Remove one or modules from your demo app:
+cb remove <module-name> <module-name-2>
+
+Set information about a module by id such as name, description, acceptance criteria, and search description:
+cb modules set <module-id> --name "New Module Name" --description "A detailed description of the module" --acceptance-criteria "The criteria that must be met for this module"
 
 Update a module definition from the demo app:
   cb commit <module-name>
 
 Update a module definition from other app:
   cb commit <module-name> --source <path>
+
+Upgrade your scaffold to the latest master:
+  cb upgrade
+
+Upgrade your scaffold to a specific version (git tag, git commit or branch name):
+  cb upgrade --version 2.3.0
 
 Glossary:
   <module-name> stands for the name of the directory where the module is defined.
