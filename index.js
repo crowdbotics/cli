@@ -494,7 +494,7 @@ Commands available:
   modules archive   Sets module into archived state
   modules get       Get information about a module by id
   modules list      Lists modules available
-  modules set       Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes "<value>"
+  modules set       Set information about a module by id such as name, description, acceptance criteria, and search description. The new values must be wrapped in quotes such as "value"
   optin             Opt in for Crowdbotics analytics
   optout            Opt out for Crowdbotics analytics
   parse             Parse and validate your modules
