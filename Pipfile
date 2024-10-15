@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 cookiecutter = "==2.4.0"
 urllib3 = "==2.1.0"
-django = "==3.2.23"
+django = "==3.2.25"
 
 [dev-packages]
 
