@@ -49,7 +49,7 @@ function generateDjangoFiles(base, name, relative = "/") {
   fs.mkdirSync(innerAppPath, { recursive: true });
   execSync(`cd ${innerAppPath}`, execOptions);
   configurePython();
-  execSync("pipenv install django==3.2.23", execOptions);
+  execSync("pipenv install django==4.2.16", execOptions);
   execSync(
     `pipenv run django-admin startapp ${sanitizedName} ${innerAppPath}`,
     execOptions
