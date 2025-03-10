@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-cookiecutter = "==2.4.0"
-urllib3 = "==2.1.0"
-django = "==3.2.23"
+cookiecutter = "==2.6.0"
+urllib3 = "==2.2.2"
+django = "==4.2.16"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
